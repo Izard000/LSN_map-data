@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mapa de contactos — vM1.17</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" />
+
+<style>
+  :root{
+    --ink:#152a30;
+    --ink-2:#1c363d;
+    --ink-3:#264349;
+    --text:#f2ece0;
+    --text-dim:#9fb3b6;
+    --accent:#e3a04f;
+    --border:rgba(242,236,224,0.10);
+    --font-display: -apple-system, "Segoe UI", system-ui, sans-serif;
+    --font-mono: "SF Mono","Cascadia Code","Roboto Mono", ui-monospace, monospace;
+    --topbar-h: 64px;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; }
+
+  body{
+    font-family:var(--font-display);
+    background:var(--ink);
+    color:var(--text);
+    overflow:hidden;
+  }
+
+  .app{ display:flex; flex-direction:column; height:100vh; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:12px 20px;
+    background:var(--ink-2);
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+    flex-wrap:wrap;
+  }
+
+  .brand{ display:flex; align-items:center; gap:12px; min-width:0; }
+
+  .brand-mark{ flex-shrink:0; width:32px; height:32px; color:var(--accent); }
+
+  .brand h1{
+    font-size:15px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    margin:0;
+    font-weight:700;
+  }
+
+  .brand .subtitle{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--text-dim);
+    margin:3px 0 0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .topbar-actions{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+
+  .btn{
+    font-family:var(--font-display);
+    font-size:13px;
+    font-weight:600;
+    padding:9px 14px;
+    border-radius:6px;
+    border:1px solid var(--border);
+    cursor:pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color .15s ease;
+    white-space:nowrap;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+
+  .btn-primary{ background:var(--accent); color:#1c1208; border-color:var(--accent); }
+  .btn-primary:hover{ background:#edb066; }
+  .btn-primary:disabled{ opacity:0.6; cursor:default; }
+
+  .btn-ghost{ background:transparent; color:var(--text-dim); }
+  .btn-ghost:hover{ color:var(--text); border-color:var(--text-dim); }
+  .btn-ghost.active{ color:var(--accent); border-color:var(--accent); }
+
+  .icon{ width:15px; height:15px; flex-shrink:0; }
+  .icon.spinning{ animation: spin 0.9s linear infinite; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  .mobile-only{ display:none; }
+
+  /* ---------- Layout ---------- */
+  .layout{ display:flex; flex:1; min-height:0; }
+
+  .sidebar{
+    flex-shrink:0;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+  }
+  .sidebar-left{
+    width:230px;
+    background:var(--ink-2);
+    border-right:1px solid var(--border);
+  }
+  .sidebar-right{
+    width:280px;
+    background:var(--ink-3);
+    border-left:1px solid var(--border);
+  }
+
+  .sidebar-header{
+    padding:14px 16px;
+    border-bottom:1px solid var(--border);
+    display:flex; flex-direction:column; gap:10px;
+    position:sticky; top:0;
+    background:inherit;
+    z-index:2;
+  }
+  .sidebar-header h2{
+    font-size:11px; letter-spacing:0.14em; text-transform:uppercase;
+    margin:0; color:var(--text-dim); font-weight:700;
+  }
+  .sidebar-header .filter-actions{ display:flex; gap:6px; }
+  .sidebar-header .counter{
+    font-family:var(--font-mono); font-size:11px; color:var(--text-dim);
+  }
+
+  .chip{
+    font-family:var(--font-display);
+    font-size:12px; font-weight:600;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,0.03);
+    color:var(--text-dim);
+    cursor:pointer;
+  }
+  .chip:hover{ color:var(--text); }
+
+  /* ---------- Sector list ---------- */
+  .sector-list{ padding:8px; display:flex; flex-direction:column; gap:6px; }
+
+  .sector-item{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 10px;
+    border-radius:6px;
+    border-left:4px solid var(--item-color, var(--accent));
+    background:rgba(255,255,255,0.03);
+    cursor:pointer;
+    opacity:0.45;
+    transition: opacity .15s ease, background .15s ease;
+  }
+  .sector-item.active{ opacity:1; background:rgba(255,255,255,0.06); }
+  .sector-item .name{ flex:1; font-size:13px; }
+  .sector-item .count{ font-family:var(--font-mono); font-size:11px; color:var(--text-dim); }
+
+  /* ---------- Entry list ---------- */
+  .entry-list{ padding:10px; display:flex; flex-direction:column; gap:8px; }
+
+  .entry-card{
+    border-left:4px solid var(--card-color, var(--accent));
+    background:rgba(255,255,255,0.03);
+    border-radius:6px;
+    padding:10px 12px;
+    cursor:pointer;
+    transition: background .15s ease;
+  }
+  .entry-card:hover{ background:rgba(255,255,255,0.07); }
+  .entry-card .name{ font-size:13px; font-weight:700; margin-bottom:4px; }
+  .entry-card .tags{ display:flex; flex-wrap:wrap; gap:4px; margin-bottom:6px; }
+  .entry-card .tag{
+    font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.06em;
+    color:#fff; background:var(--tag-color, var(--accent));
+    border-radius:3px; padding:2px 6px;
+  }
+  .entry-card .ptes{ font-size:12px; color:var(--text); margin-bottom:4px; line-height:1.4; }
+  .entry-card .ptes .label{
+    font-family:var(--font-mono); font-size:10px; text-transform:uppercase;
+    color:var(--text-dim); margin-right:4px;
+  }
+  .entry-card a.website{
+    font-size:12px; color:var(--accent); text-decoration:none; word-break:break-all;
+  }
+  .entry-card a.website:hover{ text-decoration:underline; }
+
+  .entry-empty{ padding:24px 16px; text-align:center; color:var(--text-dim); font-size:12px; line-height:1.6; }
+
+  /* ---------- Map ---------- */
+  .map-wrap{ flex:1; position:relative; min-width:0; }
+  #map{ width:100%; height:100%; background:#0f1b1f; }
+
+  .empty-state{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(21,42,48,0.92);
+    z-index:600;
+    padding:24px;
+  }
+  .empty-state.hidden{ display:none; }
+
+  .empty-card{ max-width:420px; text-align:center; }
+  .empty-card .brand-mark{ width:46px; height:46px; margin:0 auto 14px; }
+  .empty-card h2{ font-size:16px; letter-spacing:0.08em; text-transform:uppercase; margin:0 0 8px; }
+  .empty-card p{ font-size:13px; color:var(--text-dim); line-height:1.6; margin:0 0 20px; }
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(10,18,21,0.7);
+    display:flex; align-items:center; justify-content:center;
+    z-index:1000;
+    padding:20px;
+  }
+  .modal-overlay.hidden{ display:none; }
+
+  .modal{
+    background:var(--ink-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    width:100%;
+    max-width:520px;
+    max-height:90vh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  .modal-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px;
+    border-bottom:1px solid var(--border);
+  }
+  .modal-header h2{ font-size:14px; letter-spacing:0.1em; text-transform:uppercase; margin:0; }
+
+  .icon-btn{
+    background:none; border:none; color:var(--text-dim);
+    font-size:16px; cursor:pointer; padding:4px; line-height:1;
+  }
+  .icon-btn:hover{ color:var(--text); }
+
+  .modal-body{ padding:18px 20px; overflow-y:auto; }
+
+  .modal-intro{ font-size:13px; color:var(--text-dim); line-height:1.6; margin:0 0 4px; }
+
+  .field-label{
+    display:block; font-size:11px; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--text-dim); margin:14px 0 6px; font-family:var(--font-mono);
+  }
+  input[type=text]{
+    width:100%; background:var(--ink); border:1px solid var(--border); border-radius:6px;
+    color:var(--text); padding:9px 10px; font-family:var(--font-mono); font-size:12px;
+  }
+  .hint{ font-size:11px; color:var(--text-dim); margin:8px 0 16px; line-height:1.6; }
+
+  .modal-actions{ display:flex; gap:8px; margin-top:10px; }
+  .modal-actions .btn{ flex:1; justify-content:center; }
+
+  .steps{
+    margin:14px 0 10px; padding-left:20px; font-size:12px; color:var(--text-dim); line-height:1.7;
+  }
+  .steps strong{ color:var(--text); }
+
+  .advanced{ margin-top:18px; border-top:1px solid var(--border); padding-top:12px; }
+  .advanced summary{ cursor:pointer; font-size:12px; color:var(--text-dim); }
+  .advanced summary:hover{ color:var(--text); }
+
+  textarea#dataInput{
+    width:100%;
+    min-height:120px;
+    background:var(--ink);
+    border:1px solid var(--border);
+    border-radius:6px;
+    color:var(--text);
+    font-family:var(--font-mono);
+    font-size:12px;
+    padding:10px;
+    resize:vertical;
+    margin-bottom:10px;
+  }
+
+  .modal-footer{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    padding:14px 20px;
+    border-top:1px solid var(--border);
+    gap:10px;
+  }
+
+  .error-msg{
+    color:#e08a7d;
+    font-family:var(--font-mono);
+    font-size:12px;
+    margin:12px 0 0;
+    line-height:1.6;
+  }
+  .error-msg.hidden{ display:none; }
+
+  /* ---------- Popups ---------- */
+  .leaflet-popup-content-wrapper{ background:var(--ink-2); color:var(--text); border-radius:6px; }
+  .leaflet-popup-tip{ background:var(--ink-2); }
+  .leaflet-popup-content{ margin:0; }
+
+  .popup-card{ border-top:4px solid var(--card-color, var(--accent)); padding:12px 14px; min-width:200px; }
+  .popup-header{ font-size:14px; font-weight:700; margin-bottom:2px; }
+  .popup-tags{ display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px; }
+  .popup-tag{
+    font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.06em;
+    color:#fff; background:var(--tag-color, var(--accent));
+    border-radius:3px; padding:2px 6px;
+  }
+  .popup-address{ font-size:12px; color:var(--text-dim); margin-bottom:8px; line-height:1.4; }
+  .popup-row{ font-size:12px; display:flex; gap:6px; margin-bottom:3px; word-break:break-all; }
+  .popup-label{
+    font-family:var(--font-mono); font-size:10px; color:var(--text-dim);
+    text-transform:uppercase; flex-shrink:0; padding-top:1px;
+  }
+  .popup-row a{ color:var(--accent); text-decoration:none; }
+  .popup-row a:hover{ text-decoration:underline; }
+
+  /* ---------- Contact checkbox (popup + entry card) ---------- */
+  .contact-check{
+    width:15px; height:15px; flex-shrink:0; cursor:pointer;
+    accent-color: rgb(150,0,0);
+  }
+  .popup-header-row{
+    display:flex; align-items:center; gap:8px; margin-bottom:4px;
+  }
+  .popup-header-row .popup-header{ margin-bottom:0; }
+
+  .entry-card-header{
+    display:flex; align-items:center; gap:8px; margin-bottom:4px;
+  }
+  .entry-card-header .name{ flex:1; font-size:13px; font-weight:700; }
+
+  /* ---------- Table modal — fixed column widths ---------- */
+  .table-modal{ max-width:98vw; width:1200px; }
+  .table-wrap{ overflow:auto; max-height:calc(90vh - 160px); }
+  table.data-table{
+    border-collapse:collapse; width:100%; font-size:12px;
+    font-family:var(--font-mono); table-layout:fixed;
+  }
+  table.data-table th{
+    background:var(--ink); color:var(--text-dim); font-size:10px;
+    text-transform:uppercase; letter-spacing:0.08em;
+    padding:8px 10px; text-align:left; white-space:nowrap;
+    border-bottom:2px solid var(--border);
+    position:sticky; top:0; z-index:1; overflow:hidden; text-overflow:ellipsis;
+    user-select:none; position:relative;
+  }
+  .resize-handle{
+    position:absolute; right:0; top:0; bottom:0; width:5px;
+    cursor:col-resize; z-index:2;
+  }
+  .resize-handle:hover, .resize-handle.dragging{ background:var(--accent); opacity:0.7; }
+
+  /* Table toolbar */
+  .table-toolbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 16px; border-bottom:1px solid var(--border); flex-shrink:0;
+  }
+  .table-toolbar span{ font-family:var(--font-mono); font-size:11px; color:var(--text-dim); }
+  table.data-table td{
+    padding:7px 10px; border-bottom:1px solid var(--border);
+    color:var(--text); vertical-align:top;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  table.data-table td.wrap{ white-space:normal; word-break:break-word; }
+  table.data-table tr:hover td{ background:rgba(255,255,255,0.04); }
+
+  /* Column widths */
+  .col-id      { width:44px;  min-width:44px;  }
+  .col-company { width:160px; min-width:100px; }
+  .col-website { width:140px; }
+  .col-profile { width:130px; }
+  .col-address { width:160px; }
+  .col-aka     { width:110px; }
+  .col-mkt     { width:110px; }
+  .col-country { width:90px;  }
+  .col-geocode { width:90px;  }
+  .col-geocoord{ width:130px; }
+  .col-gmaps   { width:100px; }
+  .col-sectors { width:150px; }
+  .col-ptes    { width:100px; }
+  .col-brands  { width:120px; }
+  .col-notes   { width:150px; }
+
+  .tbl-tags{ display:flex; flex-wrap:wrap; gap:3px; }
+  .tbl-tag{
+    font-size:10px; padding:1px 5px; border-radius:3px;
+    color:#fff; background:var(--tag-color, var(--accent));
+    text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;
+  }
+  .table-empty{ padding:32px; text-align:center; color:var(--text-dim); font-size:13px; }
+
+  /* ---------- Cluster icons — small: blue, medium: yellow, large: orange (default) ---------- */
+  .marker-cluster-small {
+    background-color: rgba(0, 0, 160, 0.4) !important;
+  }
+  .marker-cluster-small div {
+    background-color: rgba(0, 0, 160, 0.75) !important;
+    color: #fff;
+  }
+
+  /* ---------- Search box ---------- */
+  .search-wrap{
+    display:flex; align-items:center; gap:8px;
+    background:var(--ink); border:1px solid var(--border);
+    border-radius:6px; padding:0 10px;
+    flex:1; max-width:260px;
+  }
+  .search-wrap svg{ flex-shrink:0; color:var(--text-dim); }
+  .search-wrap input{
+    background:none; border:none; outline:none;
+    color:var(--text); font-family:var(--font-display); font-size:13px;
+    padding:8px 0; width:100%;
+  }
+  .search-wrap input::placeholder{ color:var(--text-dim); }
+  .search-clear{
+    background:none; border:none; color:var(--text-dim);
+    cursor:pointer; font-size:14px; padding:0; line-height:1;
+    display:none;
+  }
+  .search-clear.visible{ display:block; }
+  .search-clear:hover{ color:var(--text); }
+  /* ---------- Drop zone ---------- */
+  .drop-zone{
+    border:2px dashed var(--border);
+    border-radius:8px;
+    padding:28px 20px;
+    text-align:center;
+    cursor:pointer;
+    transition: border-color .15s ease, background .15s ease;
+    margin-bottom:10px;
+  }
+  .drop-zone:hover, .drop-zone.drag-over{
+    border-color:var(--accent);
+    background:rgba(227,160,79,0.06);
+  }
+  .drop-zone svg{ color:var(--text-dim); margin-bottom:10px; }
+  .drop-zone .dz-title{ font-size:13px; font-weight:600; margin-bottom:4px; }
+  .drop-zone .dz-sub{ font-size:12px; color:var(--text-dim); }
+  .drop-zone .dz-sub span{ color:var(--accent); cursor:pointer; text-decoration:underline; }
+  #csvFileInput{ display:none; }
+  .file-loaded{
+    font-family:var(--font-mono); font-size:12px; color:var(--accent);
+    margin-bottom:10px; padding:8px 10px;
+    background:rgba(227,160,79,0.08); border-radius:6px;
+    display:none;
+  }
+
+  .backdrop{ display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:850; }
+  .backdrop.show{ display:block; }
+
+  @media (max-width: 900px){
+    .mobile-only{ display:inline-flex; }
+    .sidebar{
+      position:fixed;
+      top:var(--topbar-h);
+      bottom:0;
+      width:85%;
+      max-width:320px;
+      z-index:900;
+      transition: transform .2s ease;
+    }
+    .sidebar-left{ left:0; transform:translateX(-110%); }
+    .sidebar-right{ right:0; transform:translateX(110%); }
+    .sidebar.open{ transform:translateX(0); }
+    .backdrop{ top:var(--topbar-h); }
+  }
+
+  @media (max-width: 640px){
+    .brand .subtitle{ display:none; }
+    .btn span.label{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="12" cy="12" r="3" fill="currentColor"/>
+        <path d="M12 2V6" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M12 18V22" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M2 12H6" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M18 12H22" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <div>
+        <h1>Mapa de contactos</h1>
+        <p class="subtitle" id="dataStatus">Sin datos cargados</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+          <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input type="text" id="companySearch" placeholder="Buscar empresa..." autocomplete="off" />
+        <button class="search-clear" id="searchClear" title="Limpiar">✕</button>
+      </div>
+      <button id="toggleSectors" class="btn btn-ghost mobile-only">Sectores</button>
+      <button id="toggleList" class="btn btn-ghost mobile-only">Listado</button>
+      <button id="selectVisibleBtn" class="btn btn-ghost" title="Seleccionar marcadores visibles en el mapa">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+          <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+          <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+          <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+          <path d="M6 6h.01M17 6h.01M6 17h.01M17 17h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span class="label">Seleccionar visibles</span>
+      </button>
+      <button id="deselectTagsBtn" class="btn btn-ghost" title="Deseleccionar">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+          <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+          <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+          <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        <span class="label">Deseleccionar</span>
+      </button>
+      <button id="showTableBtn" class="btn btn-ghost" title="Ver tabla de datos">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+          <path d="M3 9h18M3 15h18M9 3v18" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        <span class="label">Tabla</span>
+      </button>
+      <button id="toggleClusterBtn" class="btn btn-ghost" title="Desagrupar puntos">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="5" cy="5" r="2" stroke="currentColor" stroke-width="2"/>
+          <circle cx="19" cy="5" r="2" stroke="currentColor" stroke-width="2"/>
+          <circle cx="5" cy="19" r="2" stroke="currentColor" stroke-width="2"/>
+          <circle cx="19" cy="19" r="2" stroke="currentColor" stroke-width="2"/>
+          <circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        <span class="label">Desagrupar</span>
+      </button>
+      <button id="refreshBtn" class="btn btn-ghost" title="Actualizar desde la hoja">
+        <svg class="icon" id="refreshIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 11A8 8 0 0 0 5.5 7.5M4 5v4h4M4 13a8 8 0 0 0 14.5 3.5M20 19v-4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="label">Actualizar</span>
+      </button>
+      <button id="openDataBtn" class="btn btn-primary"><span class="label">Cargar datos</span></button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <aside class="sidebar sidebar-left" id="sectorPanel">
+      <div class="sidebar-header">
+        <h2>Sectores</h2>
+        <div class="filter-actions">
+          <button id="selectAll" class="chip chip-action">Todos</button>
+          <button id="selectNone" class="chip chip-action">Ninguno</button>
+        </div>
+      </div>
+      <div class="sector-list" id="sectorList"></div>
+    </aside>
+
+    <main class="map-wrap">
+      <div id="map"></div>
+      <div class="empty-state" id="emptyState">
+        <div class="empty-card">
+          <svg class="brand-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            <path d="M12 2V6" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M12 18V22" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M2 12H6" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M18 12H22" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <h2>Sin datos</h2>
+          <p>
+            Conecta tu Google Sheet (pestaña "GMaps contacts") para ver los contactos en el mapa,
+            filtrar por sector y mantenerlos actualizados con un clic.
+          </p>
+          <button class="btn btn-primary" id="emptyLoadBtn">Cargar datos</button>
+        </div>
+      </div>
+    </main>
+
+    <aside class="sidebar sidebar-right" id="listPanel">
+      <div class="sidebar-header">
+        <h2>Listado</h2>
+        <span class="counter" id="counter"></span>
+      </div>
+      <div class="entry-list" id="entryList">
+        <div class="entry-empty">Sin datos cargados.</div>
+      </div>
+    </aside>
+
+  </div>
+
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+
+<!-- Modal -->
+<div class="modal-overlay hidden" id="dataModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Cargar datos</h2>
+      <button class="icon-btn" id="closeModal">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- GitHub URL — carga automática -->
+      <label class="field-label" for="githubUrlInput">URL de GitHub (carga automática)</label>
+      <input type="text" id="githubUrlInput" placeholder="https://raw.githubusercontent.com/usuario/repo/main/archivo.csv" />
+      <p class="hint">Pega la URL <strong>raw</strong> de tu archivo CSV en GitHub. El mapa la usará para cargar los datos automáticamente al inicio y al pulsar "Actualizar".</p>
+      <button class="btn btn-primary" id="connectGithubBtn">Conectar y cargar</button>
+
+      <div style="margin:20px 0; border-top:1px solid var(--border);"></div>
+
+      <!-- Drag & drop / file picker -->
+      <div class="drop-zone" id="dropZone">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <div class="dz-title">Arrastra el CSV aquí</div>
+        <div class="dz-sub">o <span id="browseBtn">busca el archivo</span> en tu equipo</div>
+      </div>
+      <input type="file" id="csvFileInput" accept=".csv,text/csv" />
+      <div class="file-loaded" id="fileLoaded"></div>
+
+      <details class="advanced" style="margin-top:18px; border-top:1px solid var(--border); padding-top:12px;">
+        <summary>Alternativa: pegar datos manualmente</summary>
+
+        <label class="field-label" for="sheetUrlInput">Enlace o ID de la Google Sheet</label>
+        <input type="text" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/..." />
+
+        <label class="field-label" for="sheetNameInput">Nombre de la pestaña</label>
+        <input type="text" id="sheetNameInput" value="GMaps contacts" />
+
+        <ol class="steps">
+          <li>Pulsa <strong>Abrir hoja</strong> para abrirla en otra pestaña del navegador</li>
+          <li>Selecciona encabezados y datos, copia (Ctrl/Cmd + C)</li>
+          <li>Vuelve aquí, pega abajo y pulsa <strong>Cargar datos</strong></li>
+        </ol>
+
+        <textarea id="dataInput" placeholder="Pega aquí las filas copiadas de Google Sheets..."></textarea>
+
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="openSheetBtn">Abrir hoja</button>
+          <button class="btn btn-primary" id="loadPastedBtn">Cargar datos</button>
+        </div>
+      </details>
+
+      <p class="error-msg hidden" id="loadError"></p>
+    </div>
+
+        <div class="modal-footer">
+      <button class="btn btn-ghost" id="clearStorage">Borrar datos guardados</button>
+    </div>
+  </div>
+</div>
+
+<!-- Table modal -->
+<div class="modal-overlay hidden" id="tableModal">
+  <div class="modal table-modal">
+    <div class="modal-header">
+      <h2>Tabla de contactos</h2>
+      <button class="icon-btn" id="closeTableModal">✕</button>
+    </div>
+    <div class="table-toolbar">
+      <span id="tableCount"></span>
+      <button class="btn btn-primary" id="exportExcelBtn">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2"/>
+          <path d="M14 2v6h6M8 13l2 2 4-4M8 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Exportar Excel
+      </button>
+    </div>
+    <div class="table-wrap" id="tableWrap"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+  const SECTOR_PALETTE = [
+    '#e3a04f', '#5fa3a8', '#c1572f', '#8fa06b', '#9173a0',
+    '#5d7693', '#d6bd86', '#d6776a', '#4f87b0', '#b08bbf'
+  ];
+  const NO_SECTOR = '(Sin sector)';
+  const POPUP_EXTRA_FIELDS = ['email', 'website', 'profile', 'Phone (Work)'];
+  const RAW_DATA_KEY    = 'contacts-raw';
+  const SHEET_CONFIG_KEY = 'sheet-config';
+  const SCRIPT_URL_KEY  = 'script-url';
+  const DEFAULT_GITHUB_URL = 'https://raw.githubusercontent.com/Izard000/LSN_map-data/refs/heads/main/ACCs_LSN_map_data.csv';
+
+  let map, clusterGroup, plainLayer;
+  let allRows = [];
+  let sectorColors = {};
+  let activeSectors = new Set();
+  let selectedContacts = new Set();  // stores _id of selected contacts
+  let searchQuery = '';
+  let clusteringEnabled = true;
+  let initialFitDone = false;
+
+  // ---------- Map setup ----------
+  function initMap(){
+    map = L.map('map', { zoomControl: true }).setView([40.4, -3.7], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    clusterGroup = L.markerClusterGroup({ maxClusterRadius: 50 });
+    plainLayer = L.layerGroup();
+    map.addLayer(clusterGroup);
+    map.on('moveend zoomend', updateEntryList);
+  }
+
+  // ---------- Helpers ----------
+  function escapeHtml(str){
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function parseGeoCoord(raw){
+    if (!raw) return null;
+    const cleaned = String(raw).replace(/^'/, '').trim();
+    const parts = cleaned.split(',').map(p => parseFloat(p.trim()));
+    if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1])) return null;
+    return [parts[0], parts[1]];
+  }
+
+  function colorForSector(sector){
+    if (!(sector in sectorColors)){
+      const idx = Object.keys(sectorColors).length % SECTOR_PALETTE.length;
+      sectorColors[sector] = SECTOR_PALETTE[idx];
+    }
+    return sectorColors[sector];
+  }
+
+  function normalizeUrl(url){
+    if (/^https?:\/\//i.test(url)) return url;
+    return 'https://' + url;
+  }
+
+  // ---------- Data processing ----------
+  function processData(text){
+    const result = Papa.parse(text.trim(), {
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: h => h.trim()
+    });
+
+    if (result.errors && result.errors.length){
+      throw new Error('No se han podido interpretar los datos.');
+    }
+
+    const rows = result.data;
+    sectorColors = {};
+    selectedContacts = new Set();
+    const tagCounts = {};
+
+    allRows = rows.map((r, i) => {
+      const coord = parseGeoCoord(r['GEO coord']);
+      const sectorRaw = (r['SECTOR'] || '').toString().trim();
+      const tags = sectorRaw
+        ? sectorRaw.split(',').map(t => t.trim()).filter(t => t)
+        : [NO_SECTOR];
+      return Object.assign({}, r, { _id: i, _coord: coord, _tags: tags, _sectorRaw: sectorRaw });
+    }).filter(r => r._coord);
+
+    if (!allRows.length){
+      throw new Error('No se ha encontrado ninguna fila con coordenadas válidas en "GEO coord".');
+    }
+
+    // Build color map and counts per individual tag
+    allRows.forEach(r => {
+      r._tags.forEach(tag => {
+        colorForSector(tag);
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
+    });
+
+    activeSectors = new Set(Object.keys(sectorColors));
+
+    renderSectorList(tagCounts);
+    renderMarkers();
+    updateStatus();
+
+    document.getElementById('emptyState').classList.add('hidden');
+  }
+
+  function updateStatus(){
+    const tagCount = Object.keys(sectorColors).length;
+    document.getElementById('dataStatus').textContent =
+      `${allRows.length} contactos · ${tagCount} etiquetas`;
+  }
+
+  // ---------- Rendering: sector sidebar ----------
+  function renderSectorList(counts){
+    const container = document.getElementById('sectorList');
+    container.innerHTML = '';
+    Object.keys(sectorColors).sort().forEach(sector => {
+      const item = document.createElement('div');
+      item.className = 'sector-item active';
+      item.style.setProperty('--item-color', sectorColors[sector]);
+      item.innerHTML = `<span class="name">${escapeHtml(sector)}</span><span class="count">${counts[sector]}</span>`;
+      item.addEventListener('click', () => {
+        if (activeSectors.has(sector)){
+          activeSectors.delete(sector);
+          item.classList.remove('active');
+        } else {
+          activeSectors.add(sector);
+          item.classList.add('active');
+        }
+        renderMarkers();
+      });
+      container.appendChild(item);
+    });
+  }
+
+  // ---------- Contact selection ----------
+  function toggleContactSelection(id, selected){
+    if (selected) selectedContacts.add(id);
+    else selectedContacts.delete(id);
+    renderMarkers();
+  }
+
+  function deselectAllContacts(){
+    selectedContacts.clear();
+    document.querySelectorAll('.contact-check').forEach(cb => cb.checked = false);
+    renderMarkers();
+  }
+
+  // ---------- Rendering: map markers ----------
+  const MARKER_COLOR = 'rgb(150, 0, 150)';
+
+  function rowMatchesSearch(r){
+    if (!searchQuery) return true;
+    const company = (r['Company'] || '').toString().toLowerCase();
+    return company.includes(searchQuery);
+  }
+
+  function renderMarkers(){
+    clusterGroup.clearLayers();
+    plainLayer.clearLayers();
+
+    const visible = allRows.filter(r =>
+      r._tags.some(t => activeSectors.has(t)) && rowMatchesSearch(r)
+    );
+
+    const activeLayer = clusteringEnabled ? clusterGroup : plainLayer;
+
+    const SELECTED_COLOR = 'rgb(255, 0, 0)';
+
+    visible.forEach(r => {
+      const isSelected = selectedContacts.has(r._id);
+      let color;
+      if (isSelected){
+        color = SELECTED_COLOR;
+      } else if (clusteringEnabled){
+        color = MARKER_COLOR;
+      } else {
+        color = sectorColors[r._tags[0]] || MARKER_COLOR;
+      }
+      const marker = L.circleMarker(r._coord, {
+        radius: isSelected ? 11 : 7,
+        color: color,
+        fillColor: color,
+        fillOpacity: clusteringEnabled ? 0.85 : 1,
+        weight: 2
+      });
+      marker.bindPopup(buildPopup(r));
+      activeLayer.addLayer(marker);
+    });
+
+    if (visible.length && !initialFitDone){
+      const bounds = L.latLngBounds(visible.map(r => r._coord));
+      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+      initialFitDone = true;
+    }
+
+    updateEntryList();
+  }
+
+  function popupFieldHtml(field, rawVal){
+    const val = (rawVal || '').toString().replace(/^'/, '').trim();
+    if (!val) return '';
+    const display = escapeHtml(val);
+    let html = display;
+    if (field === 'website' || field === 'profile'){
+      html = `<a href="${normalizeUrl(val)}" target="_blank" rel="noopener">${display}</a>`;
+    } else if (field === 'email'){
+      html = `<a href="mailto:${val}">${display}</a>`;
+    } else if (field === 'Phone (Work)'){
+      html = `<a href="tel:${val.replace(/\s+/g,'')}">${display}</a>`;
+    }
+    return `<div class="popup-row"><span class="popup-label">${escapeHtml(field)}</span><span>${html}</span></div>`;
+  }
+
+  function buildPopup(r){
+    const company = r['Company'] || '(Sin nombre)';
+    const address = (r['address'] || '').toString().trim();
+    const checked = selectedContacts.has(r._id) ? 'checked' : '';
+
+    // Plain tag pills (no checkboxes)
+    const tagPills = r._tags.map(tag =>
+      `<span class="popup-tag" style="--tag-color:${sectorColors[tag] || 'var(--accent)'}">${escapeHtml(tag)}</span>`
+    ).join('');
+
+    let extras = '';
+    POPUP_EXTRA_FIELDS.forEach(field => {
+      extras += popupFieldHtml(field, r[field]);
+    });
+
+    return `
+      <div class="popup-card" style="--card-color:${sectorColors[r._tags[0]] || 'var(--accent)'}">
+        <div class="popup-header-row">
+          <input type="checkbox" class="contact-check" data-id="${r._id}" ${checked} title="Seleccionar contacto" />
+          <span class="popup-header">${escapeHtml(company)}</span>
+        </div>
+        <div class="popup-tags">${tagPills}</div>
+        ${address ? `<div class="popup-address">${escapeHtml(address)}</div>` : ''}
+        ${extras}
+      </div>
+    `;
+  }
+
+  // ---------- Rendering: visible entries list ----------
+  function getVisibleRows(){
+    if (!map) return [];
+    const bounds = map.getBounds();
+    return allRows.filter(r =>
+      r._tags.some(t => activeSectors.has(t)) &&
+      rowMatchesSearch(r) &&
+      bounds.contains(L.latLng(r._coord[0], r._coord[1]))
+    );
+  }
+
+  function updateEntryList(){
+    const container = document.getElementById('entryList');
+    if (!allRows.length){
+      container.innerHTML = '<div class="entry-empty">Sin datos cargados.</div>';
+      document.getElementById('counter').textContent = '';
+      return;
+    }
+
+    const visible = getVisibleRows();
+    const filteredTotal = allRows.filter(r =>
+      r._tags.some(t => activeSectors.has(t)) && rowMatchesSearch(r)
+    ).length;
+
+    document.getElementById('counter').textContent = `${visible.length} en vista · ${filteredTotal} filtrados · ${selectedContacts.size} seleccionados`;
+
+    container.innerHTML = '';
+    if (!visible.length){
+      container.innerHTML = '<div class="entry-empty">No hay contactos visibles en esta zona del mapa. Mueve o aleja el mapa, o revisa el filtro de etiquetas.</div>';
+      return;
+    }
+
+    visible.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'entry-card';
+      card.style.setProperty('--card-color', sectorColors[r._tags[0]] || 'var(--accent)');
+
+      const company = escapeHtml(r['Company'] || '(Sin nombre)');
+      const ptes = (r['PTEs'] || '').toString().trim();
+      const website = (r['website'] || '').toString().replace(/^'/, '').trim();
+
+      const tagPills = r._tags.map(tag =>
+        `<span class="tag" style="--tag-color:${sectorColors[tag] || 'var(--accent)'}">${escapeHtml(tag)}</span>`
+      ).join('');
+
+      const isSelected = selectedContacts.has(r._id);
+
+      card.innerHTML = `
+        <div class="entry-card-header">
+          <input type="checkbox" class="contact-check" data-id="${r._id}" ${isSelected ? 'checked' : ''} title="Seleccionar contacto" />
+          <div class="name">${company}</div>
+        </div>
+        <div class="tags">${tagPills}</div>
+        ${ptes ? `<div class="ptes"><span class="label">PTEs</span>${escapeHtml(ptes)}</div>` : ''}
+        ${website ? `<a class="website" href="${normalizeUrl(website)}" target="_blank" rel="noopener">${escapeHtml(website)}</a>` : ''}
+      `;
+
+      // Checkbox: toggle selection without moving map
+      card.querySelector('.contact-check').addEventListener('change', (e) => {
+        e.stopPropagation();
+        toggleContactSelection(r._id, e.target.checked);
+        syncContactCheckboxes(r._id, e.target.checked);
+      });
+
+      // Click on card (not checkbox/link): center map
+      card.addEventListener('click', (e) => {
+        if (e.target.classList.contains('contact-check') || e.target.tagName === 'A') return;
+        map.setView(r._coord, Math.max(map.getZoom(), 15));
+      });
+
+      container.appendChild(card);
+    });
+  }
+
+  function selectVisibleContacts(){
+    getVisibleRows().forEach(r => selectedContacts.add(r._id));
+    renderMarkers(); // redraws markers and refreshes entry list checkboxes
+  }
+
+  // ---------- Table modal ----------
+  const TABLE_COLUMNS = [
+    { header: 'COMPANY',    field: 'Company',    cls: 'col-company',  link: false },
+    { header: 'SECTORS',    field: '_tags',      cls: 'col-sectors',  link: false },
+    { header: 'PTES',       field: 'PTEs',       cls: 'col-ptes',     link: false },
+    { header: 'BRANDS',     field: 'BRANDS',     cls: 'col-brands',   link: false },
+    { header: 'WEBSITE',    field: 'website',    cls: 'col-website',  link: true  },
+    { header: 'PROFILE',    field: 'profile',    cls: 'col-profile',  link: true  },
+    { header: 'CIA - AKA',  field: 'CIA - AKA',  cls: 'col-aka',      link: false },
+    { header: 'CIA - MKT',  field: 'CIA - MKT',  cls: 'col-mkt',      link: false },
+    { header: 'COUNTRY',    field: 'COUNTRY',    cls: 'col-country',  link: false },
+    { header: 'GEO CODE',   field: 'GEO code',   cls: 'col-geocode',  link: false },
+    { header: 'ADDRESS',    field: 'address',    cls: 'col-address',  link: false },
+    { header: 'GEO COORD',  field: 'GEO coord',  cls: 'col-geocoord', link: false },
+    { header: 'GMAPS',      field: 'GMaps',      cls: 'col-gmaps',    link: false },
+    { header: 'NOTES',      field: 'NOTES',      cls: 'col-notes',    link: false },
+  ];
+
+  function renderTableModal(){
+    const rows = allRows
+      .filter(r => selectedContacts.has(r._id))
+      .sort((a, b) => (a['Company'] || '').toLowerCase().localeCompare((b['Company'] || '').toLowerCase()));
+
+    const wrap = document.getElementById('tableWrap');
+
+    if (!rows.length){
+      document.getElementById('tableCount').textContent = '0 entradas';
+      wrap.innerHTML = '<div class="table-empty">No hay contactos seleccionados. Usa "Seleccionar visibles" o marca los contactos en el mapa o en el listado.</div>';
+      return;
+    }
+
+    // colgroup
+    let colgroup = '<colgroup><col class="col-id">';
+    TABLE_COLUMNS.forEach(c => { colgroup += `<col class="${c.cls}">`; });
+    colgroup += '</colgroup>';
+
+    // thead — include resize handles
+    let thead = '<thead><tr>';
+    thead += '<th class="col-id">ID<div class="resize-handle"></div></th>';
+    TABLE_COLUMNS.forEach(c => {
+      thead += `<th class="${c.cls}">${c.header}<div class="resize-handle"></div></th>`;
+    });
+    thead += '</tr></thead>';
+
+    // tbody
+    let tbody = '<tbody>';
+    rows.forEach((r, idx) => {
+      tbody += '<tr>';
+      tbody += `<td class="col-id" style="text-align:center">${idx + 1}</td>`;
+      TABLE_COLUMNS.forEach(c => {
+        if (c.field === '_tags'){
+          const pills = r._tags.map(tag =>
+            `<span class="tbl-tag" style="--tag-color:${sectorColors[tag] || 'var(--accent)'}">${escapeHtml(tag)}</span>`
+          ).join(' ');
+          tbody += `<td class="${c.cls} wrap"><div class="tbl-tags">${pills}</div></td>`;
+        } else {
+          const raw = (r[c.field] || '').toString().replace(/^'/, '').trim();
+          if (c.link && raw){
+            tbody += `<td class="${c.cls}"><a href="${normalizeUrl(raw)}" target="_blank" rel="noopener" style="color:var(--accent)">${escapeHtml(raw)}</a></td>`;
+          } else {
+            tbody += `<td class="${c.cls}">${escapeHtml(raw)}</td>`;
+          }
+        }
+      });
+      tbody += '</tr>';
+    });
+    tbody += '</tbody>';
+
+    wrap.innerHTML = `<table class="data-table" id="dataTable">${colgroup}${thead}${tbody}</table>`;
+
+    // Update toolbar count
+    document.getElementById('tableCount').textContent = `${rows.length} entradas`;
+
+    // Init resizable columns
+    initColumnResize(document.getElementById('dataTable'));
+  }
+
+  // ---------- Resizable columns ----------
+  function initColumnResize(table){
+    const ths = table.querySelectorAll('th');
+    const cols = table.querySelectorAll('col');
+
+    ths.forEach((th, i) => {
+      const handle = th.querySelector('.resize-handle');
+      if (!handle) return;
+
+      let startX, startW;
+
+      handle.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        startX = e.pageX;
+        startW = th.offsetWidth;
+        handle.classList.add('dragging');
+
+        const onMove = (e) => {
+          const newW = Math.max(40, startW + e.pageX - startX);
+          th.style.width = newW + 'px';
+          if (cols[i]) cols[i].style.width = newW + 'px';
+        };
+        const onUp = () => {
+          handle.classList.remove('dragging');
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+        };
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      });
+
+      // Double-click: auto-fit to content
+      handle.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        th.style.width = 'auto';
+        if (cols[i]) cols[i].style.width = 'auto';
+
+        // Measure widest cell in column (including header)
+        let maxW = th.scrollWidth;
+        table.querySelectorAll(`tbody tr`).forEach(row => {
+          const cell = row.cells[i];
+          if (cell) maxW = Math.max(maxW, cell.scrollWidth);
+        });
+        const newW = (maxW + 12) + 'px';
+        th.style.width = newW;
+        if (cols[i]) cols[i].style.width = newW;
+      });
+    });
+  }
+
+  // ---------- Export to Excel ----------
+  function exportToExcel(){
+    const rows = allRows
+      .filter(r => selectedContacts.has(r._id))
+      .sort((a, b) => (a['Company'] || '').toLowerCase().localeCompare((b['Company'] || '').toLowerCase()));
+
+    if (!rows.length){ alert('No hay datos para exportar.'); return; }
+
+    const headers = ['ID', ...TABLE_COLUMNS.map(c => c.header)];
+    const data = [headers];
+
+    rows.forEach((r, idx) => {
+      const row = [idx + 1];
+      TABLE_COLUMNS.forEach(c => {
+        if (c.field === '_tags'){
+          row.push(r._tags.join(', '));
+        } else {
+          row.push((r[c.field] || '').toString().replace(/^'/, '').trim());
+        }
+      });
+      data.push(row);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // Auto column widths
+    ws['!cols'] = headers.map((h, i) => ({
+      wch: Math.max(h.length, ...data.slice(1).map(r => String(r[i] || '').length), 8)
+    }));
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Contactos');
+    XLSX.writeFile(wb, 'contactos_mapa.xlsx');
+  }
+
+  // ---------- Sync checkboxes across popup and entry list ----------
+  function syncContactCheckboxes(id, checked){
+    document.querySelectorAll(`.contact-check[data-id="${id}"]`).forEach(cb => {
+      cb.checked = checked;
+    });
+  }
+
+  // Delegate contact checkbox events in map popup
+  document.getElementById('map').addEventListener('change', (e) => {
+    if (!e.target.classList.contains('contact-check')) return;
+    const id = parseInt(e.target.dataset.id, 10);
+    if (isNaN(id)) return;
+    toggleContactSelection(id, e.target.checked);
+    syncContactCheckboxes(id, e.target.checked);
+  });
+
+  async function saveScriptUrl(url){
+    try{ localStorage.setItem(SCRIPT_URL_KEY, url); } catch(e){}
+  }
+  async function loadScriptUrl(){
+    // Returns stored URL, or the default GitHub URL if nothing is stored
+    try{ return localStorage.getItem(SCRIPT_URL_KEY) || DEFAULT_GITHUB_URL; } catch(e){ return DEFAULT_GITHUB_URL; }
+  }
+
+  async function fetchFromScript(url){
+    let resp;
+    try{
+      resp = await fetch(url, { redirect: 'follow' });
+    } catch(e){
+      throw new Error('No se ha podido conectar con la URL. Comprueba que sea correcta y que el archivo sea público.');
+    }
+    const text = await resp.text();
+    if (!resp.ok || /^\s*<(!doctype|html)/i.test(text)){
+      throw new Error('La URL no devuelve datos CSV. Comprueba que el archivo de Drive sea público o que el endpoint esté activo.');
+    }
+    return text;
+  }
+
+  // ---------- Google Sheet helpers ----------
+  function extractSheetId(input){
+    const trimmed = input.trim();
+    const m = trimmed.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    return m ? m[1] : trimmed;
+  }
+
+  function buildSheetEditUrl(sheetId){
+    return `https://docs.google.com/spreadsheets/d/${sheetId}/edit`;
+  }
+
+  // ---------- Persistent storage (localStorage) ----------
+  async function saveRawData(text){
+    try{ localStorage.setItem(RAW_DATA_KEY, text); } catch(e){}
+  }
+  async function loadRawData(){
+    try{ return localStorage.getItem(RAW_DATA_KEY); } catch(e){ return null; }
+  }
+  async function saveSheetConfig(sheetId, sheetName){
+    try{ localStorage.setItem(SHEET_CONFIG_KEY, JSON.stringify({ sheetId, sheetName })); } catch(e){}
+  }
+  async function loadSheetConfig(){
+    try{
+      const val = localStorage.getItem(SHEET_CONFIG_KEY);
+      return val ? JSON.parse(val) : null;
+    } catch(e){ return null; }
+  }
+  async function clearAllStorage(){
+    try{ localStorage.removeItem(RAW_DATA_KEY); } catch(e){}
+    try{ localStorage.removeItem(SHEET_CONFIG_KEY); } catch(e){}
+    try{ localStorage.removeItem(SCRIPT_URL_KEY); } catch(e){}
+  }
+
+  // ---------- UI helpers ----------
+  function showError(msg){
+    const el = document.getElementById('loadError');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+  }
+  function hideError(){
+    document.getElementById('loadError').classList.add('hidden');
+  }
+
+  async function showModal(){
+    document.getElementById('dataModal').classList.remove('hidden');
+    hideError();
+    document.getElementById('fileLoaded').style.display = 'none';
+    const githubUrl = await loadScriptUrl();
+    if (githubUrl) document.getElementById('githubUrlInput').value = githubUrl;
+    const config = await loadSheetConfig();
+    if (config){
+      document.getElementById('sheetUrlInput').value = config.sheetId;
+      document.getElementById('sheetNameInput').value = config.sheetName;
+    }
+    const raw = await loadRawData();
+    if (raw) document.getElementById('dataInput').value = raw;
+  }
+  function hideModal(){
+    document.getElementById('dataModal').classList.add('hidden');
+  }
+
+  function resetView(){
+    allRows = [];
+    sectorColors = {};
+    activeSectors = new Set();
+    selectedContacts = new Set();
+    initialFitDone = false;
+    if (clusterGroup) clusterGroup.clearLayers();
+    if (plainLayer) plainLayer.clearLayers();
+    document.getElementById('sectorList').innerHTML = '';
+    document.getElementById('entryList').innerHTML = '<div class="entry-empty">Sin datos cargados.</div>';
+    document.getElementById('counter').textContent = '';
+    document.getElementById('emptyState').classList.remove('hidden');
+    document.getElementById('dataStatus').textContent = 'Sin datos cargados';
+  }
+
+  // ---------- Actions ----------
+  async function openSheet(){
+    hideError();
+    const rawInput = document.getElementById('sheetUrlInput').value;
+    const sheetName = document.getElementById('sheetNameInput').value.trim() || 'GMaps contacts';
+    if (!rawInput.trim()){
+      showError('Indica el enlace o el ID de la Google Sheet.');
+      return;
+    }
+    const sheetId = extractSheetId(rawInput);
+    await saveSheetConfig(sheetId, sheetName);
+    window.open(buildSheetEditUrl(sheetId), '_blank');
+    document.getElementById('dataInput').focus();
+  }
+
+  async function refreshFromSheet(){
+    const githubUrl = await loadScriptUrl();
+    if (githubUrl){
+      document.getElementById('refreshIcon').classList.add('spinning');
+      document.getElementById('refreshBtn').disabled = true;
+      try{
+        const csv = await fetchFromScript(githubUrl);
+        processData(csv);
+        await saveRawData(csv);
+      } catch(err){
+        // GitHub fetch failed — keep cached data, show modal
+        await showModal();
+      } finally{
+        document.getElementById('refreshIcon').classList.remove('spinning');
+        document.getElementById('refreshBtn').disabled = false;
+      }
+      return;
+    }
+    await showModal();
+  }
+
+  async function loadPastedData(){
+    hideError();
+    const text = document.getElementById('dataInput').value;
+    if (!text.trim()){
+      showError('Pega antes los datos copiados de la hoja.');
+      return;
+    }
+    try{
+      processData(text);
+      saveRawData(text);
+      const rawInput = document.getElementById('sheetUrlInput').value;
+      if (rawInput.trim()){
+        const sheetName = document.getElementById('sheetNameInput').value.trim() || 'GMaps contacts';
+        saveSheetConfig(extractSheetId(rawInput), sheetName);
+      }
+      hideModal();
+    } catch (err){
+      showError(err.message);
+    }
+  }
+
+  // ---------- Mobile sidebar toggles ----------
+  function toggleSidebar(id){
+    const el = document.getElementById(id);
+    const willOpen = !el.classList.contains('open');
+    document.querySelectorAll('.sidebar').forEach(s => s.classList.remove('open'));
+    document.getElementById('backdrop').classList.remove('show');
+    if (willOpen){
+      el.classList.add('open');
+      document.getElementById('backdrop').classList.add('show');
+    }
+  }
+
+  function syncTopbarHeight(){
+    const h = document.querySelector('.topbar').offsetHeight;
+    document.documentElement.style.setProperty('--topbar-h', h + 'px');
+  }
+
+  document.getElementById('selectVisibleBtn').addEventListener('click', selectVisibleContacts);
+  document.getElementById('deselectTagsBtn').addEventListener('click', deselectAllContacts);
+
+  document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+
+  document.getElementById('showTableBtn').addEventListener('click', () => {
+    renderTableModal();
+    document.getElementById('tableModal').classList.remove('hidden');
+  });
+
+  document.getElementById('closeTableModal').addEventListener('click', () => {
+    document.getElementById('tableModal').classList.add('hidden');
+  });
+
+  document.getElementById('tableModal').addEventListener('click', (e) => {
+    if (e.target.id === 'tableModal') document.getElementById('tableModal').classList.add('hidden');
+  });
+
+  // ---------- Cluster toggle ----------
+  document.getElementById('toggleClusterBtn').addEventListener('click', () => {
+    clusteringEnabled = !clusteringEnabled;
+    const btn = document.getElementById('toggleClusterBtn');
+    btn.classList.toggle('active', !clusteringEnabled);
+    btn.querySelector('.label').textContent = clusteringEnabled ? 'Desagrupar' : 'Agrupar';
+    if (clusteringEnabled){
+      map.removeLayer(plainLayer);
+      map.addLayer(clusterGroup);
+    } else {
+      map.removeLayer(clusterGroup);
+      map.addLayer(plainLayer);
+    }
+    renderMarkers();
+  });
+
+  // ---------- Search ----------
+  document.getElementById('companySearch').addEventListener('input', (e) => {
+    searchQuery = e.target.value.toLowerCase().trim();
+    document.getElementById('searchClear').classList.toggle('visible', searchQuery.length > 0);
+    renderMarkers();
+  });
+
+  document.getElementById('searchClear').addEventListener('click', () => {
+    document.getElementById('companySearch').value = '';
+    searchQuery = '';
+    document.getElementById('searchClear').classList.remove('visible');
+    renderMarkers();
+  });
+
+  // ---------- Wiring ----------
+  document.getElementById('openDataBtn').addEventListener('click', showModal);
+  document.getElementById('emptyLoadBtn').addEventListener('click', showModal);
+  document.getElementById('closeModal').addEventListener('click', hideModal);
+  document.getElementById('connectGithubBtn').addEventListener('click', async () => {
+    hideError();
+    const url = document.getElementById('githubUrlInput').value.trim();
+    if (!url){ showError('Pega la URL raw de tu archivo CSV en GitHub.'); return; }
+    if (!url.includes('raw.githubusercontent.com')){
+      showError('La URL debe ser la versión "raw" de GitHub (raw.githubusercontent.com).');
+      return;
+    }
+    const btn = document.getElementById('connectGithubBtn');
+    btn.disabled = true; btn.textContent = 'Conectando...';
+    try{
+      const csv = await fetchFromScript(url);
+      processData(csv);
+      await saveScriptUrl(url);
+      await saveRawData(csv);
+      hideModal();
+    } catch(err){
+      showError(err.message);
+    } finally{
+      btn.disabled = false; btn.textContent = 'Conectar y cargar';
+    }
+  });
+
+  document.getElementById('openSheetBtn').addEventListener('click', openSheet);
+  document.getElementById('loadPastedBtn').addEventListener('click', loadPastedData);
+
+  // ---------- Drag & drop / file picker ----------
+  function loadFromFile(file){
+    if (!file) return;
+    hideError();
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const text = e.target.result;
+      try{
+        processData(text);
+        await saveRawData(text);
+        const loaded = document.getElementById('fileLoaded');
+        loaded.textContent = '✅ ' + file.name + ' cargado correctamente';
+        loaded.style.display = 'block';
+        setTimeout(() => hideModal(), 800);
+      } catch(err){
+        showError(err.message);
+      }
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  const dropZone = document.getElementById('dropZone');
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+  });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) loadFromFile(file);
+  });
+
+  document.getElementById('browseBtn').addEventListener('click', () => {
+    document.getElementById('csvFileInput').click();
+  });
+  dropZone.addEventListener('click', (e) => {
+    if (e.target.id !== 'browseBtn') document.getElementById('csvFileInput').click();
+  });
+  document.getElementById('csvFileInput').addEventListener('change', (e) => {
+    loadFromFile(e.target.files[0]);
+  });
+  document.getElementById('refreshBtn').addEventListener('click', refreshFromSheet);
+
+  document.getElementById('toggleSectors').addEventListener('click', () => toggleSidebar('sectorPanel'));
+  document.getElementById('toggleList').addEventListener('click', () => toggleSidebar('listPanel'));
+  document.getElementById('backdrop').addEventListener('click', () => {
+    document.querySelectorAll('.sidebar').forEach(s => s.classList.remove('open'));
+    document.getElementById('backdrop').classList.remove('show');
+  });
+
+  document.getElementById('selectAll').addEventListener('click', () => {
+    activeSectors = new Set(Object.keys(sectorColors));
+    document.querySelectorAll('.sector-item').forEach(c => c.classList.add('active'));
+    renderMarkers();
+  });
+  document.getElementById('selectNone').addEventListener('click', () => {
+    activeSectors = new Set();
+    document.querySelectorAll('.sector-item').forEach(c => c.classList.remove('active'));
+    renderMarkers();
+  });
+
+  document.getElementById('clearStorage').addEventListener('click', async () => {
+    await clearAllStorage();
+    document.getElementById('dataInput').value = '';
+    document.getElementById('sheetNameInput').value = 'GMaps contacts';
+    resetView();
+    hideModal();
+  });
+
+  document.getElementById('dataModal').addEventListener('click', (e) => {
+    if (e.target.id === 'dataModal') hideModal();
+  });
+
+  window.addEventListener('resize', () => {
+    syncTopbarHeight();
+    if (map) map.invalidateSize();
+  });
+
+  // ---------- Init ----------
+  (async function init(){
+    syncTopbarHeight();
+    initMap();
+
+    // Try auto-fetch from GitHub URL if stored
+    const githubUrl = await loadScriptUrl();
+    if (githubUrl){
+      try{
+        const csv = await fetchFromScript(githubUrl);
+        processData(csv);
+        await saveRawData(csv);
+        return;
+      } catch(e){ /* fall through to cached data */ }
+    }
+
+    // Fall back to cached raw data
+    const saved = await loadRawData();
+    if (saved){
+      try{ processData(saved); } catch(e){}
+    }
+  })();
+</script>
+
+</body>
+</html>
