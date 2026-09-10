@@ -1259,6 +1259,12 @@
   async function loadRawData(){
     try{ return localStorage.getItem(RAW_DATA_KEY); } catch(e){ return null; }
   }
+  async function saveScriptUrl(url){
+    try{ localStorage.setItem(SCRIPT_URL_KEY, url); } catch(e){}
+  }
+  async function loadScriptUrl(){
+    try{ return localStorage.getItem(SCRIPT_URL_KEY) || DEFAULT_GITHUB_URL; } catch(e){ return DEFAULT_GITHUB_URL; }
+  }
   async function saveSheetConfig(sheetId, sheetName){
     try{ localStorage.setItem(SHEET_CONFIG_KEY, JSON.stringify({ sheetId, sheetName })); } catch(e){}
   }
@@ -1272,6 +1278,20 @@
     try{ localStorage.removeItem(RAW_DATA_KEY); } catch(e){}
     try{ localStorage.removeItem(SHEET_CONFIG_KEY); } catch(e){}
     try{ localStorage.removeItem(SCRIPT_URL_KEY); } catch(e){}
+  }
+
+  async function fetchFromScript(url){
+    let resp;
+    try{
+      resp = await fetch(url, { redirect:'follow' });
+    } catch(e){
+      throw new Error('No se ha podido conectar con la URL. Comprueba que sea correcta y que el archivo sea público.');
+    }
+    const text = await resp.text();
+    if (!resp.ok || /^\s*<(!doctype|html)/i.test(text)){
+      throw new Error('La URL no devuelve datos CSV. Comprueba que el archivo de GitHub sea público.');
+    }
+    return text;
   }
 
   // ---------- UI helpers ----------
