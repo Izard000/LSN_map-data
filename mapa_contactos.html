@@ -846,7 +846,7 @@
       transformHeader: h => h.trim()
     });
 
-    if (result.errors && result.errors.length){
+    if (result.errors && result.errors.some(e => e.type === 'Abort')){
       throw new Error('No se han podido interpretar los datos.');
     }
 
@@ -1724,7 +1724,7 @@
         processData(csv);
         await saveRawData(csv);
         return;
-      } catch(e){ /* fall through to cached data */ }
+      } catch(e){ console.warn('GitHub fetch failed:', e.message); /* fall through to cached data */ }
     }
 
     // Fall back to cached raw data
