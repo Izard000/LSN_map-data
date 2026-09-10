@@ -1241,6 +1241,167 @@
     });
   }
 
+
+  // ---------- Contact selection helpers ----------
+  function selectVisibleContacts(){
+    const bounds = map.getBounds();
+    const rows = zoneActive()
+      ? getZoneRows().filter(r => bounds.contains(L.latLng(r._coord[0], r._coord[1])))
+      : getVisibleRows();
+    rows.forEach(r => selectedContacts.add(r._id));
+    renderMarkers();
+  }
+
+  function syncContactCheckboxes(id, checked){
+    document.querySelectorAll(`.contact-check[data-id="${id}"]`).forEach(cb => {
+      cb.checked = checked;
+    });
+  }
+
+  // ---------- Table modal ----------
+  const TABLE_COLUMNS = [
+    { header: 'COMPANY',    field: 'Company',    cls: 'col-company',  link: false },
+    { header: 'SECTORS',    field: '_tags',      cls: 'col-sectors',  link: false },
+    { header: 'PTES',       field: 'PTEs',       cls: 'col-ptes',     link: false },
+    { header: 'BRANDS',     field: 'BRANDS',     cls: 'col-brands',   link: false },
+    { header: 'WEBSITE',    field: 'website',    cls: 'col-website',  link: true  },
+    { header: 'PROFILE',    field: 'profile',    cls: 'col-profile',  link: true  },
+    { header: 'CIA - AKA',  field: 'CIA - AKA',  cls: 'col-aka',      link: false },
+    { header: 'CIA - MKT',  field: 'CIA - MKT',  cls: 'col-mkt',      link: false },
+    { header: 'COUNTRY',    field: 'COUNTRY',    cls: 'col-country',  link: false },
+    { header: 'GEO CODE',   field: 'GEO code',   cls: 'col-geocode',  link: false },
+    { header: 'ADDRESS',    field: 'address',    cls: 'col-address',  link: false },
+    { header: 'GEO COORD',  field: 'GEO coord',  cls: 'col-geocoord', link: false },
+    { header: 'GMAPS',      field: 'GMaps',      cls: 'col-gmaps',    link: false },
+    { header: 'NOTES',      field: 'NOTES',      cls: 'col-notes',    link: false },
+  ];
+
+  function renderTableModal(){
+    const rows = allRows
+      .filter(r => selectedContacts.has(r._id))
+      .sort((a, b) => (a['Company'] || '').toLowerCase().localeCompare((b['Company'] || '').toLowerCase()));
+
+    const wrap = document.getElementById('tableWrap');
+
+    if (!rows.length){
+      document.getElementById('tableCount').textContent = '0 entradas';
+      wrap.innerHTML = '<div class="table-empty">No hay contactos seleccionados. Usa "Seleccionar visibles" o marca los contactos en el mapa o en el listado.</div>';
+      return;
+    }
+
+    let colgroup = '<colgroup><col class="col-id">';
+    TABLE_COLUMNS.forEach(c => { colgroup += `<col class="${c.cls}">`; });
+    colgroup += '</colgroup>';
+
+    let thead = '<thead><tr>';
+    thead += '<th class="col-id">ID<div class="resize-handle"></div></th>';
+    TABLE_COLUMNS.forEach(c => {
+      thead += `<th class="${c.cls}">${c.header}<div class="resize-handle"></div></th>`;
+    });
+    thead += '</tr></thead>';
+
+    let tbody = '<tbody>';
+    rows.forEach((r, idx) => {
+      tbody += '<tr>';
+      tbody += `<td class="col-id" style="text-align:center">${idx + 1}</td>`;
+      TABLE_COLUMNS.forEach(c => {
+        if (c.field === '_tags'){
+          const pills = r._tags.map(tag =>
+            `<span class="tbl-tag" style="--tag-color:${sectorColors[tag] || 'var(--accent)'}">${escapeHtml(tag)}</span>`
+          ).join(' ');
+          tbody += `<td class="${c.cls} wrap"><div class="tbl-tags">${pills}</div></td>`;
+        } else {
+          const raw = (r[c.field] || '').toString().replace(/^'/, '').trim();
+          if (c.link && raw){
+            tbody += `<td class="${c.cls}"><a href="${normalizeUrl(raw)}" target="_blank" rel="noopener" style="color:var(--accent)">${escapeHtml(raw)}</a></td>`;
+          } else {
+            tbody += `<td class="${c.cls}">${escapeHtml(raw)}</td>`;
+          }
+        }
+      });
+      tbody += '</tr>';
+    });
+    tbody += '</tbody>';
+
+    wrap.innerHTML = `<table class="data-table" id="dataTable">${colgroup}${thead}${tbody}</table>`;
+    document.getElementById('tableCount').textContent = `${rows.length} entradas`;
+    initColumnResize(document.getElementById('dataTable'));
+  }
+
+  function initColumnResize(table){
+    const ths  = table.querySelectorAll('th');
+    const cols = table.querySelectorAll('col');
+    ths.forEach((th, i) => {
+      const handle = th.querySelector('.resize-handle');
+      if (!handle) return;
+      let startX, startW;
+      handle.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        startX = e.pageX; startW = th.offsetWidth;
+        handle.classList.add('dragging');
+        const onMove = (e) => {
+          const newW = Math.max(40, startW + e.pageX - startX);
+          th.style.width = newW + 'px';
+          if (cols[i]) cols[i].style.width = newW + 'px';
+        };
+        const onUp = () => {
+          handle.classList.remove('dragging');
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+        };
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      });
+      handle.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        let maxW = th.scrollWidth;
+        table.querySelectorAll('tbody tr').forEach(row => {
+          const cell = row.cells[i];
+          if (cell) maxW = Math.max(maxW, cell.scrollWidth);
+        });
+        const newW = (maxW + 12) + 'px';
+        th.style.width = newW;
+        if (cols[i]) cols[i].style.width = newW;
+      });
+    });
+  }
+
+  function exportToExcel(){
+    const rows = allRows
+      .filter(r => selectedContacts.has(r._id))
+      .sort((a, b) => (a['Company'] || '').toLowerCase().localeCompare((b['Company'] || '').toLowerCase()));
+
+    if (!rows.length){ alert('No hay datos para exportar.'); return; }
+
+    const headers = ['ID', ...TABLE_COLUMNS.map(c => c.header)];
+    const data = [headers];
+    rows.forEach((r, idx) => {
+      const row = [idx + 1];
+      TABLE_COLUMNS.forEach(c => {
+        if (c.field === '_tags') row.push(r._tags.join(', '));
+        else row.push((r[c.field] || '').toString().replace(/^'/, '').trim());
+      });
+      data.push(row);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    ws['!cols'] = headers.map((h, i) => ({
+      wch: Math.max(h.length, ...data.slice(1).map(r => String(r[i] || '').length), 8)
+    }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Contactos');
+    XLSX.writeFile(wb, 'contactos_mapa.xlsx');
+  }
+
+  // ---------- Sync checkboxes across popup and entry list ----------
+  document.getElementById('map').addEventListener('change', (e) => {
+    if (!e.target.classList.contains('contact-check')) return;
+    const id = parseInt(e.target.dataset.id, 10);
+    if (isNaN(id)) return;
+    toggleContactSelection(id, e.target.checked);
+    syncContactCheckboxes(id, e.target.checked);
+  });
+
   // ---------- Google Sheet helpers ----------
   function extractSheetId(input){
     const trimmed = input.trim();
