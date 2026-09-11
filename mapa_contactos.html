@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mapa de contactos — vM01.21</title>
+<title>Mapa de contactos — vM01.22</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
@@ -769,7 +769,7 @@
   // Hover state
   let hoveredMarkerIds = new Set();
   let markerRegistry   = new Map();   // _id → {leafletMarker, row}
-  let sectorHoverTimer = null, sectorUnhoverTimer = null;
+  let sectorHoverTimers = new Map();  // sector name → {in, out}
   let cardHoverTimers  = new Map();    // _id → {in, out}
   let markerHoverTimer = null;
 
@@ -904,6 +904,7 @@
   function renderSectorList(counts){
     const container = document.getElementById('sectorList');
     container.innerHTML = '';
+    sectorHoverTimers.clear();
     Object.keys(sectorColors).sort().forEach(sector => {
       const item = document.createElement('div');
       item.className = 'sector-item active';
@@ -921,9 +922,13 @@
       });
 
       // Hover 300ms → highlight unclustered markers of this sector
+      // Per-sector timers, so leaving card A and entering card B
+      // doesn't cancel card A's pending restore.
+      sectorHoverTimers.set(sector, { in: null, out: null });
       item.addEventListener('mouseenter', () => {
-        clearTimeout(sectorUnhoverTimer);
-        sectorHoverTimer = setTimeout(() => {
+        const t = sectorHoverTimers.get(sector);
+        clearTimeout(t.out);
+        t.in = setTimeout(() => {
           if (!activeSectors.has(sector)) return;
           const ids = allRows
             .filter(r => r._tags.includes(sector))
@@ -933,8 +938,9 @@
         }, 300);
       });
       item.addEventListener('mouseleave', () => {
-        clearTimeout(sectorHoverTimer);
-        sectorUnhoverTimer = setTimeout(() => {
+        const t = sectorHoverTimers.get(sector);
+        clearTimeout(t.in);
+        t.out = setTimeout(() => {
           const ids = allRows.filter(r => r._tags.includes(sector)).map(r => r._id);
           setHoverState(ids, false);
         }, 300);
