@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mapa de contactos — vM01.22</title>
+<title>Mapa de contactos — vM01.23</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
@@ -954,7 +954,10 @@
   function toggleContactSelection(id, selected){
     if (selected) selectedContacts.add(id);
     else selectedContacts.delete(id);
-    renderMarkers();
+    // Update only this marker's style in place — a full renderMarkers()
+    // rebuild would destroy the marker (and any open popup on it).
+    updateMarkerStyles([id]);
+    updateEntryList();
   }
 
   function deselectAllContacts(){
