@@ -958,6 +958,18 @@
   // ---------- Rendering: map markers ----------
   const MARKER_COLOR = 'rgb(150, 0, 150)';
 
+  function rowMatchesSearch(r){
+    if (!searchQuery) return true;
+    const terms = searchQuery.split(';').map(t => t.trim()).filter(t => t.length > 0);
+    if (terms.length === 0) return true;
+    const fields = [
+      (r['Company']   || ''),
+      (r['CIA - AKA'] || ''),
+      (r['CIA - MKT'] || '')
+    ].map(v => v.toString().toLowerCase());
+    return terms.some(term => fields.some(field => field.includes(term)));
+  }
+
   // ── Zone helpers ──────────────────────────────────────────────────────
   function zoneActive(){ return zonePolygons.length > 0; }
 
