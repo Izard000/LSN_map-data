@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mapa de contactos — vM01.23</title>
+<title>Mapa de contactos — vM01.24</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
@@ -479,9 +479,17 @@
   }
   .zone-indicator.hidden{ display:none; }
 
+  .zone-distance{
+    position:absolute; pointer-events:none; z-index:650;
+    background:rgba(21,42,48,0.92); color:#fff;
+    font-family:var(--font-mono); font-size:11px;
+    padding:3px 7px; border-radius:4px; white-space:nowrap;
+    display:none;
+  }
+
   /* ---------- Drawing cursor ---------- */
-  #map.drawing-zone{ cursor:crosshair !important; }
-  #map.drawing-zone *{ cursor:crosshair !important; }
+  #map.drawing-zone{ cursor:crosshair; }
+  #map.drawing-zone *{ cursor:inherit; }
 
   /* ---------- RESET ZONA disabled ---------- */
   .btn:disabled{ opacity:0.38; cursor:default; pointer-events:none; }
@@ -586,7 +594,11 @@
         <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <polygon points="3,17 8,3 15,8 21,5 20,19 10,21" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>
         </svg>
-        <span class="label">SELEC. ZONA</span>
+      </button>
+      <button id="selectCircleZoneBtn" class="btn btn-ghost" title="Seleccionar zona con círculo (CTRL=añadir, SHIFT=sustraer)">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+        </svg>
       </button>
       <button id="resetZoneBtn" class="btn btn-ghost" title="Eliminar zona" disabled>
         <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -614,6 +626,7 @@
     <main class="map-wrap">
       <div id="map"></div>
       <div class="zone-indicator hidden" id="zoneIndicator"></div>
+      <div class="zone-distance" id="zoneDistance"></div>
       <div class="empty-state" id="emptyState">
         <div class="empty-card">
           <svg class="brand-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -782,8 +795,12 @@
   let zoneLayer   = null;             // single Leaflet layer drawing zoneGeoJSON
   let isDrawingZone = false;
   let drawingMode   = 'new';          // 'new' | 'add' | 'subtract'
-  let drawingPoints = [];
-  let drawingPolyline = null;
+  let drawingShape  = 'polygon';      // 'polygon' | 'circle'
+  let drawingPoints = [];             // polygon: confirmed vertices [lat,lng]
+  let drawingPolyline = null;         // polygon: confirmed edges
+  let rubberLine      = null;         // polygon: live edge from last vertex to cursor
+  let drawingCenter   = null;         // circle: L.latLng of center
+  let previewCircleLayer = null;      // circle: live preview L.circle
 
   // Date
   let lastUpdateDate = null;
@@ -1654,15 +1671,62 @@
     document.getElementById('zoneIndicator').classList.add('hidden');
   }
 
-  function startZoneDrawing(mode){
+  // ── Custom +/- cursor (32×32 SVG, base64 data URI) ─────────────────────
+  function buildZoneCursor(mode){
+    if (mode === 'new') return 'crosshair';
+    const symbol = mode === 'add' ? '+' : '−';
+    const fill   = mode === 'add' ? '#5fd97d' : '#e08a7d';
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+      <line x1="16" y1="4" x2="16" y2="12" stroke="white" stroke-width="2"/>
+      <line x1="16" y1="20" x2="16" y2="28" stroke="white" stroke-width="2"/>
+      <line x1="4" y1="16" x2="12" y2="16" stroke="white" stroke-width="2"/>
+      <line x1="20" y1="16" x2="28" y2="16" stroke="white" stroke-width="2"/>
+      <circle cx="16" cy="16" r="2" fill="white"/>
+      <circle cx="24" cy="8" r="7" fill="${fill}" stroke="white" stroke-width="1.5"/>
+      <text x="24" y="12" font-size="12" font-family="sans-serif" font-weight="bold" text-anchor="middle" fill="#111">${symbol}</text>
+    </svg>`;
+    const b64 = btoa(unescape(encodeURIComponent(svg)));
+    return `url("data:image/svg+xml;base64,${b64}") 16 16, crosshair`;
+  }
+
+  function setZoneCursor(mode){
+    document.getElementById('map').style.cursor = buildZoneCursor(mode);
+  }
+  function clearZoneCursor(){
+    document.getElementById('map').style.cursor = '';
+  }
+
+  // ── Distance indicator ──────────────────────────────────────────────
+  function formatDistance(km){
+    if (km < 1) return Math.round(km * 1000) + ' m';
+    return km.toFixed(2) + ' km';
+  }
+
+  function showDistanceIndicator(containerPoint, km){
+    const el = document.getElementById('zoneDistance');
+    el.textContent = formatDistance(km);
+    el.style.left = (containerPoint.x + 16) + 'px';
+    el.style.top  = (containerPoint.y + 16) + 'px';
+    el.style.display = 'block';
+  }
+  function hideDistanceIndicator(){
+    document.getElementById('zoneDistance').style.display = 'none';
+  }
+
+  // ── Start / cancel / cleanup (shared by polygon and circle) ─────────
+  function startZoneDrawing(mode, shape){
     if (isDrawingZone) cancelZoneDrawing();
     isDrawingZone = true;
     drawingMode   = mode;
+    drawingShape  = shape;
     drawingPoints = [];
+    drawingCenter = null;
     document.getElementById('map').classList.add('drawing-zone');
+    setZoneCursor(mode);
     showZoneIndicator(mode);
     map.on('click', onZoneMapClick);
-    map.on('dblclick', onZoneMapDblClick);
+    map.on('mousemove', onZoneMouseMove);
+    if (shape === 'polygon') map.on('dblclick', onZoneMapDblClick);
     document.addEventListener('keydown', onZoneKeyDown);
   }
 
@@ -1673,33 +1737,90 @@
   function cleanupDrawing(){
     isDrawingZone = false;
     drawingPoints = [];
+    drawingCenter = null;
     if (drawingPolyline){ map.removeLayer(drawingPolyline); drawingPolyline = null; }
+    if (rubberLine){ map.removeLayer(rubberLine); rubberLine = null; }
+    if (previewCircleLayer){ map.removeLayer(previewCircleLayer); previewCircleLayer = null; }
     document.getElementById('map').classList.remove('drawing-zone');
+    clearZoneCursor();
     hideZoneIndicator();
+    hideDistanceIndicator();
     map.off('click', onZoneMapClick);
+    map.off('mousemove', onZoneMouseMove);
     map.off('dblclick', onZoneMapDblClick);
     document.removeEventListener('keydown', onZoneKeyDown);
   }
 
+  // ── Map click: dispatch by shape ─────────────────────────────────────
   function onZoneMapClick(e){
     L.DomEvent.stopPropagation(e);
-    // Check if clicking near first point to close (min 3 points)
-    if (drawingPoints.length >= 3){
-      const fp = map.latLngToContainerPoint(L.latLng(drawingPoints[0][0], drawingPoints[0][1]));
-      const cp = map.latLngToContainerPoint(e.latlng);
-      if (fp.distanceTo(cp) < 20){ finishZonePolygon(); return; }
+
+    if (drawingShape === 'polygon'){
+      // Check if clicking near first point to close (min 3 points)
+      if (drawingPoints.length >= 3){
+        const fp = map.latLngToContainerPoint(L.latLng(drawingPoints[0][0], drawingPoints[0][1]));
+        const cp = map.latLngToContainerPoint(e.latlng);
+        if (fp.distanceTo(cp) < 20){ finishZonePolygon(); return; }
+      }
+      drawingPoints.push([e.latlng.lat, e.latlng.lng]);
+      updateDrawingLayer();
+
+    } else { // circle
+      if (!drawingCenter){
+        drawingCenter = e.latlng;
+      } else {
+        const radiusKm = turf.distance(
+          [drawingCenter.lng, drawingCenter.lat],
+          [e.latlng.lng, e.latlng.lat],
+          { units:'kilometers' }
+        );
+        finishZoneCircle(radiusKm);
+      }
     }
-    drawingPoints.push([e.latlng.lat, e.latlng.lng]);
-    updateDrawingLayer();
   }
 
   function onZoneMapDblClick(e){
     L.DomEvent.stopPropagation(e);
-    if (drawingPoints.length >= 3) finishZonePolygon();
+    if (drawingShape === 'polygon' && drawingPoints.length >= 3) finishZonePolygon();
   }
 
   function onZoneKeyDown(e){
     if (e.key === 'Escape') cancelZoneDrawing();
+  }
+
+  // ── Live preview on mouse move ───────────────────────────────────────
+  function onZoneMouseMove(e){
+    if (drawingShape === 'polygon'){
+      if (drawingPoints.length === 0) return;
+      const last = drawingPoints[drawingPoints.length - 1];
+      const lastLatLng = L.latLng(last[0], last[1]);
+
+      if (rubberLine) map.removeLayer(rubberLine);
+      rubberLine = L.polyline([lastLatLng, e.latlng], {
+        color:'rgb(125,0,255)', weight:2, dashArray:'4'
+      }).addTo(map);
+
+      const km = turf.distance([last[1], last[0]], [e.latlng.lng, e.latlng.lat], { units:'kilometers' });
+      showDistanceIndicator(e.containerPoint, km);
+
+    } else { // circle
+      if (!drawingCenter) return;
+      const km = turf.distance(
+        [drawingCenter.lng, drawingCenter.lat],
+        [e.latlng.lng, e.latlng.lat],
+        { units:'kilometers' }
+      );
+      const radiusMeters = km * 1000;
+
+      if (previewCircleLayer) map.removeLayer(previewCircleLayer);
+      previewCircleLayer = L.circle(drawingCenter, {
+        radius: radiusMeters,
+        color:'rgb(125,0,255)', weight:2, dashArray:'4',
+        fillColor:'rgb(125,0,255)', fillOpacity: 0.1
+      }).addTo(map);
+
+      showDistanceIndicator(e.containerPoint, km);
+    }
   }
 
   function updateDrawingLayer(){
@@ -1731,12 +1852,8 @@
     }).addTo(map);
   }
 
-  function finishZonePolygon(){
-    if (drawingPoints.length < 3) return;
-    const mode = drawingMode;
-    const newPoly = toTurfPolygon(drawingPoints);
-    cleanupDrawing();
-
+  // ── Shared union/subtract/new application, for both shapes ─────────
+  function applyZoneOperation(newPoly, mode){
     if (mode === 'new'){
       zoneGeoJSON = newPoly;
 
@@ -1762,6 +1879,22 @@
     updateResetZoneButton();
   }
 
+  function finishZonePolygon(){
+    if (drawingPoints.length < 3) return;
+    const mode = drawingMode;
+    const newPoly = toTurfPolygon(drawingPoints);
+    cleanupDrawing();
+    applyZoneOperation(newPoly, mode);
+  }
+
+  function finishZoneCircle(radiusKm){
+    if (!(radiusKm > 0)){ cleanupDrawing(); return; }
+    const mode = drawingMode;
+    const newPoly = turf.circle([drawingCenter.lng, drawingCenter.lat], radiusKm, { steps:64, units:'kilometers' });
+    cleanupDrawing();
+    applyZoneOperation(newPoly, mode);
+  }
+
   function clearAllZones(){
     if (zoneLayer && map){ map.removeLayer(zoneLayer); }
     zoneLayer = null;
@@ -1785,7 +1918,13 @@
   document.getElementById('selectZoneBtn').addEventListener('click', (e) => {
     const mode = e.ctrlKey ? 'add' : (e.shiftKey ? 'subtract' : 'new');
     if (mode === 'subtract' && !zoneActive()) return; // SHIFT + no zone = nothing
-    startZoneDrawing(mode);
+    startZoneDrawing(mode, 'polygon');
+  });
+
+  document.getElementById('selectCircleZoneBtn').addEventListener('click', (e) => {
+    const mode = e.ctrlKey ? 'add' : (e.shiftKey ? 'subtract' : 'new');
+    if (mode === 'subtract' && !zoneActive()) return; // SHIFT + no zone = nothing
+    startZoneDrawing(mode, 'circle');
   });
 
   document.getElementById('resetZoneBtn').addEventListener('click', () => {
