@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mapa de contactos — vM01.20</title>
+<title>Mapa de contactos — vM01.21</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
@@ -743,6 +743,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
 <script>
   const SECTOR_PALETTE = [
@@ -777,7 +778,8 @@
   let popupCloseTimer   = null;
 
   // Zone
-  let zonePolygons  = [];             // [{latlngs, type:'add'|'subtract', layer}]
+  let zoneGeoJSON = null;             // turf Polygon/MultiPolygon (union/difference result)
+  let zoneLayer   = null;             // single Leaflet layer drawing zoneGeoJSON
   let isDrawingZone = false;
   let drawingMode   = 'new';          // 'new' | 'add' | 'subtract'
   let drawingPoints = [];
@@ -971,28 +973,15 @@
   }
 
   // ── Zone helpers ──────────────────────────────────────────────────────
-  function zoneActive(){ return zonePolygons.length > 0; }
+  function zoneActive(){ return zoneGeoJSON !== null; }
 
-  function pointInPolygon(point, latlngs){
-    const [lat, lng] = point;
-    let inside = false;
-    const n = latlngs.length;
-    for (let i = 0, j = n - 1; i < n; j = i++){
-      const xi = latlngs[i].lat, yi = latlngs[i].lng;
-      const xj = latlngs[j].lat, yj = latlngs[j].lng;
-      const cross = ((yi > lng) !== (yj > lng)) &&
-        (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
-      if (cross) inside = !inside;
-    }
-    return inside;
-  }
-
+  // r._coord is [lat, lng]; turf uses [lng, lat] point order
   function isMarkerInZone(r){
-    let inZone = false;
-    for (const {latlngs, type} of zonePolygons){
-      if (pointInPolygon(r._coord, latlngs)) inZone = type === 'add';
-    }
-    return inZone;
+    if (!zoneGeoJSON) return false;
+    const pt = turf.point([r._coord[1], r._coord[0]]);
+    try{
+      return turf.booleanPointInPolygon(pt, zoneGeoJSON);
+    } catch(e){ return false; }
   }
 
   function getZoneRows(){
@@ -1713,38 +1702,61 @@
     }
   }
 
+  // Build a turf Polygon from an array of [lat, lng] points (closes the ring)
+  function toTurfPolygon(points){
+    const ring = points.map(([lat, lng]) => [lng, lat]);
+    ring.push(ring[0]); // close the ring
+    return turf.polygon([ring]);
+  }
+
+  function drawZoneLayer(){
+    if (zoneLayer){ map.removeLayer(zoneLayer); zoneLayer = null; }
+    if (!zoneGeoJSON) return;
+    zoneLayer = L.geoJSON(zoneGeoJSON, {
+      style: {
+        color: 'rgb(125,0,255)',
+        weight: 2,
+        fillColor: 'rgb(125,0,255)',
+        fillOpacity: 0.2   // 80% transparent
+      }
+    }).addTo(map);
+  }
+
   function finishZonePolygon(){
     if (drawingPoints.length < 3) return;
-    const latlngs = drawingPoints.map(([lat,lng]) => L.latLng(lat,lng));
     const mode = drawingMode;
+    const newPoly = toTurfPolygon(drawingPoints);
     cleanupDrawing();
 
-    // For subtract: if SHIFT+no zone → nothing (guarded at call site)
-    // If result leaves zone empty → equivalent to reset
-    const layer = L.polygon(latlngs, {
-      color:'rgb(125,0,255)', weight:2,
-      fillColor:'rgb(125,0,255)',
-      fillOpacity: mode === 'subtract' ? 0.10 : 0.33
-    }).addTo(map);
-
     if (mode === 'new'){
-      clearAllZones();
-      zonePolygons = [{ latlngs, type:'add', layer }];
-    } else {
-      zonePolygons.push({ latlngs, type: mode === 'add' ? 'add' : 'subtract', layer });
-      // If subtract empties the zone → reset
-      const anyIn = allRows.some(r => isMarkerInZone(r));
-      if (!anyIn){ clearAllZones(); renderMarkers(); updateResetZoneButton(); return; }
+      zoneGeoJSON = newPoly;
+
+    } else if (mode === 'add'){
+      zoneGeoJSON = zoneGeoJSON ? turf.union(zoneGeoJSON, newPoly) : newPoly;
+
+    } else { // subtract
+      if (!zoneGeoJSON) return; // guarded at call site, nothing to subtract from
+      zoneGeoJSON = turf.difference(zoneGeoJSON, newPoly);
+      if (!zoneGeoJSON){
+        // Result is empty → equivalent to RESET ZONA
+        clearAllZones();
+        renderMarkers();
+        updateResetZoneButton();
+        return;
+      }
     }
 
-    map.fitBounds(layer.getBounds(), { padding:[30,30] });
+    drawZoneLayer();
+    const bounds = L.geoJSON(zoneGeoJSON).getBounds();
+    map.fitBounds(bounds, { padding:[30,30] });
     renderMarkers();
     updateResetZoneButton();
   }
 
   function clearAllZones(){
-    zonePolygons.forEach(({layer}) => { if(map) map.removeLayer(layer); });
-    zonePolygons = [];
+    if (zoneLayer && map){ map.removeLayer(zoneLayer); }
+    zoneLayer = null;
+    zoneGeoJSON = null;
   }
 
   // Close popup on map click (not on marker click — marker uses stopPropagation)
