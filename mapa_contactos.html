@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mapa de contactos — vM01.25</title>
+<title>Mapa de contactos — vM01.26</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
@@ -561,7 +561,7 @@
           <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
           <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
-        <input type="text" id="companySearch" placeholder="buscar COMPANY, AKA, MKT" autocomplete="off" />
+        <input type="text" id="companySearch" placeholder="buscar COMPANY, AKA, MKT, GEO CODE" autocomplete="off" />
         <button class="search-clear" id="searchClear" title="Limpiar">✕</button>
       </div>
       <button id="toggleSectors" class="btn btn-ghost btn-icon mobile-only" title="Sectores">
@@ -1018,8 +1018,9 @@
     const fields = [
       (r['Company']   || ''),
       (r['CIA - AKA'] || ''),
-      (r['CIA - MKT'] || '')
-    ].map(v => v.toString().toLowerCase());
+      (r['CIA - MKT'] || ''),
+      (r['GEO code']  || '')
+    ].map(v => v.toString().replace(/^'/, '').toLowerCase());
     return terms.some(term => fields.some(field => field.includes(term)));
   }
 
