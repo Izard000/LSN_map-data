@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mapa de contactos — vM01.26</title>
+<title>Mapa de contactos — vM01.27</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
@@ -1654,7 +1654,7 @@
     clusteringEnabled = !clusteringEnabled;
     const btn = document.getElementById('toggleClusterBtn');
     btn.classList.toggle('active', !clusteringEnabled);
-    btn.querySelector('.label').textContent = clusteringEnabled ? 'Desagrupar' : 'Agrupar';
+    btn.title = clusteringEnabled ? 'Desagrupar puntos' : 'Agrupar puntos';
     if (clusteringEnabled){
       map.removeLayer(plainLayer);
       map.addLayer(clusterGroup);
