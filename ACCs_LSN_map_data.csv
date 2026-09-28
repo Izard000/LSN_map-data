@@ -1,4 +1,4 @@
-#META,27/09/26
+#META,28/09/26
 ID,Groups,Company,email,website,profile,address,CIA - AKA,CIA - MKT,country,GEO code,GEO coord,GMaps,SECTOR,PTEs,BRANDs,Notes
 1,LSN,A Factoría Ecolóxica (es),,https://www.the-bio-factory.com/,,"A Factoría Ecolóxica; Pol- de Pocomaco, primera avenida, parcela C1, nave 3; 15190; A Coruña; SPAIN",the bio factory (es),,Spain,,"43.33537144264918, -8.422904145886847","https://www.google.com/maps/search/?api=1&query=43.33537144264918,-8.422904145886847",frozen desserts,ice-cream,,2026/04 Lasenor
 2,LSN,ABCD nutrition (fr),,http://abcdnutrition.com/,,513 rue Robert Estienne; 60400; Noyon; FRANCE,Guaranteed Gluten Free (GGF),ABCD Nutrition Groupe (grp),France,FR-1003,"49.575649212993696, 3.028357005788655","https://www.google.com/maps/search/?api=1&query=48.09324711413949,-0.7536558212888065",bakery,,Céliane - Gluten free,2026/04 Lasenor
@@ -703,83 +703,82 @@ Nigay (fr) / Nigai (fr)"
 607,LSN,Disproquima (es),,https://disproquima.com/,,"Disproquima; Carrer la Terra, 42; 08227; Terrassa; Barcelona; SPAIN",,Disproquima (grp),Spain,,"41.54522380177154, 2.045612842905252","https://www.google.com/maps/search/?api=1&query=42.14013708995324,2.5220452299892817","partner, food, feed, nutra / pharma, chemical",,,2026/04 Lasenor
 608,LSN,Centres R&D Nestle (fr),,https://www.nestle.fr/,,Centre Recherche Développement Nestlé; RUE DE L'EUROPE; 80800; AUBIGNY; FRANCE,,Nestlé (grp),France,FR-1003,"49.90353081417036, 2.4734733846100325","https://www.google.com/maps/search/?api=1&query=48.948393263995115,2.8570511068278472",food,,,2026/04 Lasenor
 609,LSN,Guisabel - Candé (fr),,https://www.guisabel.fr/,,Chocolaterie Guisabel; Route de Loiré; 49440; Candé; FRANCE,,Saveurs Délices (grp),France,FR-0701,"47.56763184782862, -1.025230198979637","https://www.google.com/maps/search/?api=1&query=48.101181091064134,-4.025012000509911",xoco,"dolç, xoco, crema",Guisabel,2026/04 Lasenor
-610,LSN,Alinova (fr),,,,Parc d'Activités du Pont Camet; 22800; Saint-Brandan; FRANCE,,Difagri (fr),France,FR-0702,"48.39576126829624, -2.892297144114197",https://maps.app.goo.gl/hqY5nyKsC2a23GNE9,feed,,,"2026/09 Lasenor
-lead SPACE 2026 (fr)
-Difagri (fr) / Alinova (fr)
-Difagri adquirió Alinova en abril de 2025.
-Difagri (Montaigu-Vendée, 85600) es especialista en dietética/nutrición animal, tradicionalmente centrada en rumiantes, con inversores como FrenchFood Capital.
-Alinova (Saint-Brandan, Côtes-d'Armor, 22800), fundada en 2018 por Guy y Jean-Marie Jolly, está especializada en emulsiones y productos dietéticos/nutricionales para monogástricos (aves y porcino) — es decir, un negocio complementario al de Difagri.
-El 28 de abril de 2025, Difagri se fusionó con/adquirió Alinova, formando lo que la prensa describe como el líder francés en dietética y especialidades nutricionales para animales de granja, combinando la experiencia en rumiantes de Difagri con la de monogástricos de Alinova. El grupo combinado factura unos 35 M€ consolidados, y ambas marcas siguen operando bajo sus propios nombres. Tras la operación, la familia Jolly (vía su holding ""Bharal Développement"") entró como accionista junto a FrenchFood Capital y otros inversores existentes."
-611,LSN,Alliance Nutrition Animale (fr),,,,Rte de Lucheux; 80600; Doullens; FRANCE,,,France,FR-1002,"50.16290170766386, 2.359764819863896",https://maps.app.goo.gl/vL4dtQQ8icN4JZWa6,feed,,,"2026/09 Lasenor
-lead SPACE 2026 (fr)
-Alliance Nutrition Animale (fr)"
-612,LSN,ARC Nutrition (fr),,,,25 Crenan; 22800; Le Foeil; FRANCE,,,France,FR-0702,"48.418860838547886, -2.8795719220827705",https://maps.app.goo.gl/f7fkz6poosP7qMpm8,feed,,,"2026/09 Lasenor
-lead SPACE 2026 (fr)
-ARC Nutrition (fr)"
-613,LSN,BioFournil (fr),,www.biofournil.com,,BioFournil - ZA La Camusière - Le Puiset-Doré; 49600; Montrevault-sur-Èvre; FRANCE,,,France,FR-0701,"47.234364615019174, -1.125689608086502",https://maps.app.goo.gl/CX7d4EkJzj2Yjmin6,"bakery, BIO",pa BIO,,2026/08 Lasenor
-614,LSN,Bonilait Proteines (fr),,,,"5, route de Saint-Georges; 86361; Chasseneuil-du-Poitou; FRANCE",,Groupe Sodiaal (fr),France,FR-0701,"46.6268839570975, 0.3655502193109316",https://maps.app.goo.gl/wC6qsnZqBHTpcSn87,feed,,,"2026/09 Lasenor
-lead SPACE 2026 (fr)
-Bonilait Proteines (fr) / Groupe Sodiaal (fr)"
-615,LSN,Candia (fr),,http://www.candia.fr/,,116 Rue George Sand; 42350; La Talaudière; FRANCE,,Groupe Sodiaal (fr),France,FR-0602,"45.47213443681997, 4.4301949014975115","https://www.google.com/maps/search/?api=1&query=38.07974230360467,-1.2252248658545928","dairy, additives",,,2026/04 Lasenor
-616,LSN,Celtilait (fr),,,,Ouest Elevage; 380 Lesgall an Taro; 29260; Ploudaniel; FRANCE,,LAÏTA,France,FR-0702,"48.539398580858006, -4.367965156993711",https://maps.app.goo.gl/JahyiRM41v4rEkng6,feed,,,"2026/09 Lasenor
-lead SPACE 2026 (fr)
-Filial Laïta (fr)"
-617,LSN,Cevital (dz),,http://www.cevital-agro-industrie.com,,Cevital Agro-Industrie; Rte Arrière Port; Béjaïa; 06000; ALGERIA,,,Algeria,,"36.74113929184886, 5.076358140705733",https://maps.app.goo.gl/CNkNhzaNJKjibubaA,"confectionary, dairy, beverage, xoco, salses",,,2026/08 Lasenor
-618,LSN,Confiserie Triki Le Moulin (tn),,https://www.confiserietriki.com/,,Route de Gabès km3; 3052; Sfax; TUNISIE,,,Tunisia,,"34.71832184356315, 10.731359685276253","https://www.google.com/maps/search/?api=1&query=43.54528910681921,5.3677122703407925",confectionary,,,2026/04 Lasenor
-619,LSN,Cooperl (fr),,,,21 Rue d'Armor Maroué; 22400; Lamballe-Armor; FRANCE,,,France,FR-0702,"48.46894074748597, -2.5410964814642685",https://maps.app.goo.gl/s7CAJXnjwK9wEZ9r6,feed,,,"2026/09 Lasenor
-lead SPACE 2026 (fr)
-Cooperl (fr)"
-620,LSN,Difagri (fr),,,,"499 rue des Valois, PA des Marches de Bretagne; 85600; Montaigu; FRANCE",,Difagri (fr),France,FR-0701,"47.02020381170475, -1.3480299417428574",https://maps.app.goo.gl/gkJh6ZFUV3fc2TvMA,feed,,,"2026/09 Lasenor
-lead SPACE 2026 (fr)
-Difagri (fr) / Alinova (fr)
-Difagri adquirió Alinova en abril de 2025.
-Difagri (Montaigu-Vendée, 85600) es especialista en dietética/nutrición animal, tradicionalmente centrada en rumiantes, con inversores como FrenchFood Capital.
-Alinova (Saint-Brandan, Côtes-d'Armor, 22800), fundada en 2018 por Guy y Jean-Marie Jolly, está especializada en emulsiones y productos dietéticos/nutricionales para monogástricos (aves y porcino) — es decir, un negocio complementario al de Difagri.
-El 28 de abril de 2025, Difagri se fusionó con/adquirió Alinova, formando lo que la prensa describe como el líder francés en dietética y especialidades nutricionales para animales de granja, combinando la experiencia en rumiantes de Difagri con la de monogástricos de Alinova. El grupo combinado factura unos 35 M€ consolidados, y ambas marcas siguen operando bajo sus propios nombres. Tras la operación, la familia Jolly (vía su holding ""Bharal Développement"") entró como accionista junto a FrenchFood Capital y otros inversores existentes."
-621,LSN,Fromagerie Le Centurion (fr),,https://www.le-centurion.com/,,Za Les Portes Du Nord; 62820; Libercourt; FRANCE,,,France,FR-1002,"50.49276723512499, 2.9973589732398063",https://maps.app.goo.gl/XVgiC7WK39qxgsK28,dairy,process cheese,,2026/07 Lasenor
-622,LSN,GERBOPA (fr),,https://www.gerbopa.com/,,24 Av. de la Grande Armée; 75017; Paris; FRANCE,,,France,FR-0801,"48.875664683927866, 2.2908266155883443",https://maps.app.goo.gl/KqVCAnxdqmUYh9sQ9,"partner, bakery",central de compres per productors bakery,,2026/08 Lasenor
-623,LSN,Huilerie GID (fr),,https://www.huileriegid.fr/,,ZA LAPOUYADE; 33230; Saint-Médard-de-Guizières; FRANCE,,,France,FR-0203,"45.01790723351222, -0.07430812234747196",https://maps.app.goo.gl/xuYHgQ1mDdMwaE1D7,"additives, oils, salses",,CUISINOR,2026/08 Lasenor
-624,LSN,L'Oréal Aulnay (fr),,https://www.loreal.com/fr/,,1 avenue Eugène Schueller; 93600; Aulnay-Sous-Bois; FRANCE,L'Oreal (fr),Groupe L'Oréal (fr),France,FR-0802,"48.93101216552314, 2.50755985715507",https://maps.app.goo.gl/oepSNdJXreqzpSyu9,cosmetic,,,"2026/08 Lasenor
+610,LSN,BioFournil (fr),,www.biofournil.com,,BioFournil - ZA La Camusière - Le Puiset-Doré; 49600; Montrevault-sur-Èvre; FRANCE,,,France,FR-0701,"47.234364615019174, -1.125689608086502",https://maps.app.goo.gl/CX7d4EkJzj2Yjmin6,"bakery, BIO",pa BIO,,2026/08 Lasenor
+611,LSN,Candia (fr),,http://www.candia.fr/,,116 Rue George Sand; 42350; La Talaudière; FRANCE,,Groupe Sodiaal (fr),France,FR-0602,"45.47213443681997, 4.4301949014975115","https://www.google.com/maps/search/?api=1&query=38.07974230360467,-1.2252248658545928","dairy, additives",,,2026/04 Lasenor
+612,LSN,Cevital (dz),,http://www.cevital-agro-industrie.com,,Cevital Agro-Industrie; Rte Arrière Port; Béjaïa; 06000; ALGERIA,,,Algeria,,"36.74113929184886, 5.076358140705733",https://maps.app.goo.gl/CNkNhzaNJKjibubaA,"confectionary, dairy, beverage, xoco, salses",,,2026/08 Lasenor
+613,LSN,Fromagerie Le Centurion (fr),,https://www.le-centurion.com/,,Za Les Portes Du Nord; 62820; Libercourt; FRANCE,,,France,FR-1002,"50.49276723512499, 2.9973589732398063",https://maps.app.goo.gl/XVgiC7WK39qxgsK28,dairy,process cheese,,2026/07 Lasenor
+614,LSN,GERBOPA (fr),,https://www.gerbopa.com/,,24 Av. de la Grande Armée; 75017; Paris; FRANCE,,,France,FR-0801,"48.875664683927866, 2.2908266155883443",https://maps.app.goo.gl/KqVCAnxdqmUYh9sQ9,"partner, bakery",central de compres per productors bakery,,2026/08 Lasenor
+615,LSN,Huilerie GID (fr),,https://www.huileriegid.fr/,,ZA LAPOUYADE; 33230; Saint-Médard-de-Guizières; FRANCE,,,France,FR-0203,"45.01790723351222, -0.07430812234747196",https://maps.app.goo.gl/xuYHgQ1mDdMwaE1D7,"additives, oils, salses",,CUISINOR,2026/08 Lasenor
+616,LSN,L'Oréal Aulnay (fr),,https://www.loreal.com/fr/,,1 avenue Eugène Schueller; 93600; Aulnay-Sous-Bois; FRANCE,L'Oreal (fr),Groupe L'Oréal (fr),France,FR-0802,"48.93101216552314, 2.50755985715507",https://maps.app.goo.gl/oepSNdJXreqzpSyu9,cosmetic,,,"2026/08 Lasenor
 L'Oréal / L'Oreal"
-625,LSN,Laboratoire Physan (fr),,,,"6, rue des Avoiries; 22100; Saint-Samson-sur-Rance; FRANCE",Laboratoire Physan La Probiolyse (fr),Groupe LACTO (fr),France,FR-0703,"48.49034719259773, -2.036688295488327",https://maps.app.goo.gl/itruZqjhsa5KqRyh6,feed,,,"2026/09 Lasenor
-lead SPACE 2026 (fr)
-Laboratoire Physan (fr)"
-626,LSN,LACTO Production (fr),,,,43 La Brohinière; 35360; Montauban-de-Bretagne; FRANCE,,Groupe LACTO (fr),France,FR-0703,"48.211604581793665, -2.1112100115386605",https://maps.app.goo.gl/VpzxCZwE4SfM33A89,feed,,,"2026/09 Lasenor
-lead SPACE 2026 (fr)
-LACTO Production (fr)"
-627,LSN,Laïta Gouesnou (fr),,https://www.laita.com/,,"4 Rue Henri Becquerel, ZI de Kergaradec; 29850; Gouesnou; Brest; FRANCE",,LAÏTA,France,FR-0702,"48.43263946748658, -4.450481268879594","https://maps.app.goo.gl/4utGM3KFh6oaJzZn9
+617,LSN,Laïta Gouesnou (fr),,https://www.laita.com/,,"4 Rue Henri Becquerel, ZI de Kergaradec; 29850; Gouesnou; Brest; FRANCE",,LAÏTA,France,FR-0702,"48.43263946748658, -4.450481268879594","https://maps.app.goo.gl/4utGM3KFh6oaJzZn9
 ","dairy, instant, BF","margarina, process cheese, yoghurt, fresh milk",,"2026/04 Lasenor
 Laïta Nutrition (fr) / Laita Nutrition (fr)"
-628,LSN,Laiterie Collet (fr),,https://www.maisoncollet.fr/,,356 Rue De La Parenthèse - Za Chemin De La Grange Vignat; 42370; Renaison; FRANCE,,,France,FR-0602,"46.054379053072495, 3.94940030322779",https://maps.app.goo.gl/8YheojMycWVikbWw5,dairy,iogurts,"Baïko, L'Atelier Dessy, Maison Collet",2026/07 Lasenor
-629,LSN,materna (fr),,https://www.materna-france.fr/,,"2 Bis Chemin D'armancourt, Les Vergers; 60200; Compiègne; FRANCE",,,France,FR-0803,"49.389770870332505, 2.7939547131944718",https://maps.app.goo.gl/tv65W2HLHphb5JsK7,BF,"Baby Food, Liquid and Powder Infant Milk",,2026/07 Lasenor
-630,LSN,Nature & Cie (fr),Melika.Zouari@Nature-et-Cie.fr,https://nature-et-cie.fr/,https://www.linkedin.com/in/m%C3%A9lika-zouari-8890a564/,7 rue des Potiers - ZA Ouest les Dorices; 44330; Vallet; FRANCE,,,France,FR-0701,"47.18254864577098, -1.2604371199839635",https://maps.app.goo.gl/8Tg4NEuPeuKK2hLi7,"bakery, BIO",pa BIO,,"2026/08 Lasenor
+618,LSN,Laiterie Collet (fr),,https://www.maisoncollet.fr/,,356 Rue De La Parenthèse - Za Chemin De La Grange Vignat; 42370; Renaison; FRANCE,,,France,FR-0602,"46.054379053072495, 3.94940030322779",https://maps.app.goo.gl/8YheojMycWVikbWw5,dairy,iogurts,"Baïko, L'Atelier Dessy, Maison Collet",2026/07 Lasenor
+619,LSN,materna (fr),,https://www.materna-france.fr/,,"2 Bis Chemin D'armancourt, Les Vergers; 60200; Compiègne; FRANCE",,,France,FR-0803,"49.389770870332505, 2.7939547131944718",https://maps.app.goo.gl/tv65W2HLHphb5JsK7,BF,"Baby Food, Liquid and Powder Infant Milk",,2026/07 Lasenor
+620,LSN,Nature & Cie (fr),Melika.Zouari@Nature-et-Cie.fr,https://nature-et-cie.fr/,https://www.linkedin.com/in/m%C3%A9lika-zouari-8890a564/,7 rue des Potiers - ZA Ouest les Dorices; 44330; Vallet; FRANCE,,,France,FR-0701,"47.18254864577098, -1.2604371199839635",https://maps.app.goo.gl/8Tg4NEuPeuKK2hLi7,"bakery, BIO",pa BIO,,"2026/08 Lasenor
 Bon et Sans Gluten"
-631,LSN,Novus France (fr),,,,"8, Boulevard Albert Einstein; 44300; Nantes; FRANCE",,Novus International (cat),France,FR-0701,"47.26161784311389, -1.558101805069746",https://maps.app.goo.gl/GiHwoya7XZ5Z9Xi37,feed,,,"2026/09 Lasenor
+621,LSN,Novus France (fr),,,,"8, Boulevard Albert Einstein; 44300; Nantes; FRANCE",,Novus International (cat),France,FR-0701,"47.26161784311389, -1.558101805069746",https://maps.app.goo.gl/GiHwoya7XZ5Z9Xi37,feed,,,"2026/09 Lasenor
 lead SPACE 2026 (fr)
 Novus France (fr)"
-632,LSN,nu.ance (fr),,,,5 rue des Compagnons d'Emmaüs; 35300; Fougères; FRANCE,,Global Nutrition International (fr),France,FR-0703,"48.35490327741623, -1.1852285214124625",https://maps.app.goo.gl/C2QZ6ZxfNUFJxJV79,feed,,,"2026/09 Lasenor
+622,LSN,Nutripure (fr),,https://www.nutripure.fr/fr/,,Nutripure; 439 Rue Morhange; 31450; Deyme; FRANCE,,,France,FR-0202,"43.4906903699835, 1.532240115157692","https://www.google.com/maps/search/?api=1&query=49.575649212993696,3.028357005788655","instant, nutra / pharma, ingredients",PTEs en pols per nutra i sport,,2026/04 Lasenor
+623,LSN,Patis'Nord (fr),,http://www.puratos.fr/,,4 rue Désir Prevost; 91070; Bondoufle; FRANCE,PatisFrance - Puratos,Puratos (grp),France,FR-0802,"48.61770896083395, 2.393231471679107",https://maps.app.goo.gl/HjWRPB8uLMnjC1fo8,bakery,,,2026/04 Lasenor
+624,LSN,Prova Montrichard (fr),,https://www.prova.fr/,,3 Rue des Tonnarderies; 41400; Montrichard Val de Cher; FRANCE,,PROVA (fr),France,FR-0803,"47.35276045774037, 1.1961439997648837",https://maps.app.goo.gl/BT4cmG9UMbL3Nfej9,additives,,,2026/03 Lasenor
+625,LSN,Régilait France Milk (fr),,https://www.regilait.com/,,102 Rd 906 Saint Belleroche; 71009; Macon; FRANCE,,,France,FR-0603,"46.385152263682976, 4.868720679786748",https://maps.app.goo.gl/z3HFprqrViRtd1Y19,"dairy, BF","llet pols, llet condensada, llet BF",,"2026/07 Lasenor
+Régilait France Milk (fr) / Regilait France Milk (fr)"
+626,LSN,Soc. Ind. de Saint Florent (fr),,https://www.lactalis.com/,,Pont de Vallée Route du; 49410; Mauges-sur-Loire; FRANCE,,Groupe Lactalis (grp),France,FR-0701,"47.3607038470226, -1.0064441426771722","https://www.google.com/maps/search/?api=1&query=30.447945660134586,-9.654481450992826",dairy,,,2026/04 Lasenor
+627,LSN,Société Industrielle de Bondues - CEMA (fr),,http://www.lactalis.com/,,CEMA; 64 Rue des Ravennes; 59910; Bondues; FRANCE,SIB,,France,FR-1002,"50.71361047692103, 3.1317282476547668","https://www.google.com/maps/search/?api=1&query=43.18632383523306,2.75284300276433","dairy, additives",,,2026/04 Lasenor
+628,LSN,Alinova (fr),,https://www.alinova.fr/; https://www.difagri.fr/,,Parc d'Activités du Pont Camet; 22800; Saint-Brandan; FRANCE,,Difagri (fr),France,FR-0702,"48.39576126829624, -2.892297144114197",https://maps.app.goo.gl/hqY5nyKsC2a23GNE9,feed,,,"2026/09 Lasenor
+lead SPACE 2026 (fr)
+Difagri (fr) / Alinova (fr)
+Difagri adquirió Alinova en abril de 2025.
+Difagri (Montaigu-Vendée, 85600) es especialista en dietética/nutrición animal, tradicionalmente centrada en rumiantes, con inversores como FrenchFood Capital.
+Alinova (Saint-Brandan, Côtes-d'Armor, 22800), fundada en 2018 por Guy y Jean-Marie Jolly, está especializada en emulsiones y productos dietéticos/nutricionales para monogástricos (aves y porcino) — es decir, un negocio complementario al de Difagri.
+El 28 de abril de 2025, Difagri se fusionó con/adquirió Alinova, formando lo que la prensa describe como el líder francés en dietética y especialidades nutricionales para animales de granja, combinando la experiencia en rumiantes de Difagri con la de monogástricos de Alinova. El grupo combinado factura unos 35 M€ consolidados, y ambas marcas siguen operando bajo sus propios nombres. Tras la operación, la familia Jolly (vía su holding ""Bharal Développement"") entró como accionista junto a FrenchFood Capital y otros inversores existentes."
+629,LSN,Alliance Nutrition Animale (fr),,https://www.alliance-na.com/,,Rte de Lucheux; 80600; Doullens; FRANCE,,,France,FR-1002,"50.16290170766386, 2.359764819863896",https://maps.app.goo.gl/vL4dtQQ8icN4JZWa6,feed,,,"2026/09 Lasenor
+lead SPACE 2026 (fr)
+Alliance Nutrition Animale (fr)"
+630,LSN,ARC Nutrition (fr),,https://arc-nutrition.fr/,,25 Crenan; 22800; Le Foeil; FRANCE,,,France,FR-0702,"48.418860838547886, -2.8795719220827705",https://maps.app.goo.gl/f7fkz6poosP7qMpm8,feed,,,"2026/09 Lasenor
+lead SPACE 2026 (fr)
+ARC Nutrition (fr)"
+631,LSN,Bonilait Proteines (fr),,https://www.bonilait.com/,,"5, route de Saint-Georges; 86361; Chasseneuil-du-Poitou; FRANCE",,Groupe Sodiaal (fr),France,FR-0701,"46.6268839570975, 0.3655502193109316",https://maps.app.goo.gl/wC6qsnZqBHTpcSn87,feed,,,"2026/09 Lasenor
+lead SPACE 2026 (fr)
+Bonilait Proteines (fr) / Groupe Sodiaal (fr)"
+632,LSN,Celtilait (fr),,https://www.laita.com/,,Ouest Elevage; 380 Lesgall an Taro; 29260; Ploudaniel; FRANCE,,LAÏTA,France,FR-0702,"48.539398580858006, -4.367965156993711",https://maps.app.goo.gl/JahyiRM41v4rEkng6,feed,,,"2026/09 Lasenor
+lead SPACE 2026 (fr)
+Filial Laïta (fr)"
+633,LSN,Cooperl (fr),,https://www.cooperl.com/,,21 Rue d'Armor Maroué; 22400; Lamballe-Armor; FRANCE,,,France,FR-0702,"48.46894074748597, -2.5410964814642685",https://maps.app.goo.gl/s7CAJXnjwK9wEZ9r6,feed,,,"2026/09 Lasenor
+lead SPACE 2026 (fr)
+Cooperl (fr)"
+634,LSN,Difagri (fr),,https://www.difagri.fr/; https://www.alinova.fr/,,"499 rue des Valois, PA des Marches de Bretagne; 85600; Montaigu; FRANCE",,Difagri (fr),France,FR-0701,"47.02020381170475, -1.3480299417428574",https://maps.app.goo.gl/gkJh6ZFUV3fc2TvMA,feed,,,"2026/09 Lasenor
+lead SPACE 2026 (fr)
+Difagri (fr) / Alinova (fr)
+Difagri adquirió Alinova en abril de 2025.
+Difagri (Montaigu-Vendée, 85600) es especialista en dietética/nutrición animal, tradicionalmente centrada en rumiantes, con inversores como FrenchFood Capital.
+Alinova (Saint-Brandan, Côtes-d'Armor, 22800), fundada en 2018 por Guy y Jean-Marie Jolly, está especializada en emulsiones y productos dietéticos/nutricionales para monogástricos (aves y porcino) — es decir, un negocio complementario al de Difagri.
+El 28 de abril de 2025, Difagri se fusionó con/adquirió Alinova, formando lo que la prensa describe como el líder francés en dietética y especialidades nutricionales para animales de granja, combinando la experiencia en rumiantes de Difagri con la de monogástricos de Alinova. El grupo combinado factura unos 35 M€ consolidados, y ambas marcas siguen operando bajo sus propios nombres. Tras la operación, la familia Jolly (vía su holding ""Bharal Développement"") entró como accionista junto a FrenchFood Capital y otros inversores existentes."
+635,LSN,Laboratoire Physan (fr),,https://www.physan.fr/,,"6, rue des Avoiries; 22100; Saint-Samson-sur-Rance; FRANCE",Laboratoire Physan La Probiolyse (fr),Groupe LACTO (fr),France,FR-0703,"48.49034719259773, -2.036688295488327",https://maps.app.goo.gl/itruZqjhsa5KqRyh6,feed,,,"2026/09 Lasenor
+lead SPACE 2026 (fr)
+Laboratoire Physan (fr) / Groupe LACTO (fr)"
+636,LSN,LACTO Production (fr),,https://www.lactoproduction.fr/,,43 La Brohinière; 35360; Montauban-de-Bretagne; FRANCE,,Groupe LACTO (fr),France,FR-0703,"48.211604581793665, -2.1112100115386605",https://maps.app.goo.gl/VpzxCZwE4SfM33A89,feed,,,"2026/09 Lasenor
+lead SPACE 2026 (fr)
+LACTO Production (fr)"
+637,LSN,nu.ance (fr),,https://nuancebio.com/; https://www.globalnutrition.com/,,5 rue des Compagnons d'Emmaüs; 35300; Fougères; FRANCE,,Global Nutrition International (fr),France,FR-0703,"48.35490327741623, -1.1852285214124625",https://maps.app.goo.gl/C2QZ6ZxfNUFJxJV79,feed,,,"2026/09 Lasenor
 lead SPACE 2026 (fr)"
-633,LSN,Nutripure (fr),,https://www.nutripure.fr/fr/,,Nutripure; 439 Rue Morhange; 31450; Deyme; FRANCE,,,France,FR-0202,"43.4906903699835, 1.532240115157692","https://www.google.com/maps/search/?api=1&query=49.575649212993696,3.028357005788655","instant, nutra / pharma, ingredients",PTEs en pols per nutra i sport,,2026/04 Lasenor
-634,LSN,Olmix (fr),,,,ZA du Haut du Bois; 56580; Bréhan; FRANCE,,,France,FR-0702,"48.05062361084338, -2.691814514665009",https://maps.app.goo.gl/eSn3ZptAXtEJSaKG9,feed,,,"2026/09 Lasenor
+638,LSN,Olmix (fr),,https://olmix.com/,,ZA du Haut du Bois; 56580; Bréhan; FRANCE,,,France,FR-0702,"48.05062361084338, -2.691814514665009",https://maps.app.goo.gl/eSn3ZptAXtEJSaKG9,feed,,,"2026/09 Lasenor
 lead SPACE 2026 (fr)
 Olmix (fr)
 Es un grupo francés de biotecnología/agtech especializado en soluciones a base de algas, con dos divisiones principales: nutrición/salud animal (aditivos para piensos, gestión de micotoxinas, productos inmunitarios) y cuidado vegetal (biostimulantes, fertilizantes organominerales, tratamiento de semillas). Cuenta con más de 850 empleados y 5 centros de I+D."
-635,LSN,Patis'Nord (fr),,http://www.puratos.fr/,,4 rue Désir Prevost; 91070; Bondoufle; FRANCE,PatisFrance - Puratos,Puratos (grp),France,FR-0802,"48.61770896083395, 2.393231471679107",https://maps.app.goo.gl/HjWRPB8uLMnjC1fo8,bakery,,,2026/04 Lasenor
-636,LSN,Phytosynthese (fr),,,,8 Rue Blaise Pascal; 63360; Saint-Beauzire; FRANCE,,,France,FR-0501,"45.852137644373194, 3.1667589680998685",https://maps.app.goo.gl/u56c9UzwAewJ94dNA,feed,,,"2026/09 Lasenor
+639,LSN,Phytosynthese (fr),,https://www.phytosynthese.com/,,8 Rue Blaise Pascal; 63360; Saint-Beauzire; FRANCE,,,France,FR-0501,"45.852137644373194, 3.1667589680998685",https://maps.app.goo.gl/u56c9UzwAewJ94dNA,feed,,,"2026/09 Lasenor
 lead SPACE 2026 (fr)
 Phytosynthese (fr)"
-637,LSN,Prova Montrichard (fr),,https://www.prova.fr/,,3 Rue des Tonnarderies; 41400; Montrichard Val de Cher; FRANCE,,PROVA (fr),France,FR-0803,"47.35276045774037, 1.1961439997648837",https://maps.app.goo.gl/BT4cmG9UMbL3Nfej9,additives,,,2026/03 Lasenor
-638,LSN,Régilait France Milk (fr),,https://www.regilait.com/,,102 Rd 906 Saint Belleroche; 71009; Macon; FRANCE,,,France,FR-0603,"46.385152263682976, 4.868720679786748",https://maps.app.goo.gl/z3HFprqrViRtd1Y19,"dairy, BF","llet pols, llet condensada, llet BF",,"2026/07 Lasenor
-Régilait France Milk (fr) / Regilait France Milk (fr)"
-639,LSN,Serval (fr),,,,La Creuse; 79800; Sainte-Eanne; FRANCE,,,France,FR-0701,"46.38289666608944, -0.13554750855482917",https://maps.app.goo.gl/9ZuLMKvu8uW3cxBA9,feed,,,"2026/09 Lasenor
+640,LSN,Serval (fr),,https://www.serval.fr/,,La Creuse; 79800; Sainte-Eanne; FRANCE,,,France,FR-0701,"46.38289666608944, -0.13554750855482917",https://maps.app.goo.gl/9ZuLMKvu8uW3cxBA9,feed,,,"2026/09 Lasenor
 lead SPACE 2026 (fr)
 Serval (fr)"
-640,LSN,Soc. Ind. de Saint Florent (fr),,https://www.lactalis.com/,,Pont de Vallée Route du; 49410; Mauges-sur-Loire; FRANCE,,Groupe Lactalis (grp),France,FR-0701,"47.3607038470226, -1.0064441426771722","https://www.google.com/maps/search/?api=1&query=30.447945660134586,-9.654481450992826",dairy,,,2026/04 Lasenor
-641,LSN,Société Industrielle de Bondues - CEMA (fr),,http://www.lactalis.com/,,CEMA; 64 Rue des Ravennes; 59910; Bondues; FRANCE,SIB,,France,FR-1002,"50.71361047692103, 3.1317282476547668","https://www.google.com/maps/search/?api=1&query=43.18632383523306,2.75284300276433","dairy, additives",,,2026/04 Lasenor
-642,LSN,Tanin Sevnica (si),,,,Hermanova Cesta 1; 8290; Sevnica; SLOVENIA,Tanin Sevnica Kemična Industrija (si),,France,,"46.01301155966141, 15.295723164419327",,feed,,,"2026/09 Lasenor
+641,LSN,Tanin Sevnica (si),,http://www.tanin.si/,,Hermanova Cesta 1; 8290; Sevnica; SLOVENIA,Tanin Sevnica Kemična Industrija (si),,France,,"46.01301155966141, 15.295723164419327",,feed,,,"2026/09 Lasenor
 lead SPACE 2026 (fr)
 Tanin Sevnica Kemična Industrija (si)"
-643,LSN,Techna France Nutrition (fr),,www.groupe-techna.com,,"Techna France Nutrition; 41, route de St-Etienne-de-Montluc; 44220; Couëron; FRANCE",,TECHNA (fr),France,FR-0701,"47.24877308413928, -1.7017685734308605","https://www.google.com/maps/search/?api=1&query=41.54595015311623,2.429987793129204",feed,,Feedia,"2026/04 Lasenor
+642,LSN,Techna France Nutrition (fr),,www.groupe-techna.com; https://www.groupe-techna.com/fr/feedia,,"Techna France Nutrition; 41, route de St-Etienne-de-Montluc; 44220; Couëron; FRANCE",,TECHNA (fr),France,FR-0701,"47.24877308413928, -1.7017685734308605","https://www.google.com/maps/search/?api=1&query=41.54595015311623,2.429987793129204",feed,,Feedia,"2026/04 Lasenor
 Filiales operativas (cada una ligada a una marca comercial):
 TECHNA FRANCE NUTRITION (marca Feedia — piensos para fabricantes/integradores)
 Sede: Les Landes de Bauche, Route de Saint-Étienne-de-Montluc, 44220 Couëron
@@ -792,7 +791,7 @@ Sede: Route de Saint-Étienne-de-Montluc, 44220 Couëron
 
 Feedia (fr)
 Para fabricantes de piensos/integradores (avicultura, rumiantes, porcino, conejos, acuicultura, caballos)."
-644,LSN,Techna Natual (fr),,,,52 Vauvelle; 49330; Les Hauts-d'Anjou; FRANCE,,TECHNA (fr),France,FR-0703,"47.69148573680317, -0.4915900778358296",https://maps.app.goo.gl/xSH3fHviNGx2VHA2A,feed,,Natual,"2026/09 Lasenor
+643,LSN,Techna Natual (fr),,www.groupe-techna.com; https://www.groupe-techna.com/fr/natual,,52 Vauvelle; 49330; Les Hauts-d'Anjou; FRANCE,,TECHNA (fr),France,FR-0703,"47.69148573680317, -0.4915900778358296",https://maps.app.goo.gl/xSH3fHviNGx2VHA2A,feed,,Natual,"2026/09 Lasenor
 lead SPACE 2026 (fr)
 Filiales operativas (cada una ligada a una marca comercial):
 TECHNA FRANCE NUTRITION (marca Feedia — piensos para fabricantes/integradores)
@@ -806,14 +805,15 @@ Sede: Route de Saint-Étienne-de-Montluc, 44220 Couëron
 
 Natual (fr)
 Nutrición de ""salud natural"" para ganaderos y agricultores (suplementos no sintéticos para rumiantes, avicultura, porcino, conejos, y nutrición foliar para cultivos: reproducción, inmunidad, salud respiratoria, control de parásitos, periodos de transición)."
-645,LSN,Vétalis Châteaubernard - Cognac (fr),,,,10 Avenue d'Angoulême; 16100; Châteaubernard; FRANCE,,Vetalis (fr),France,FR-0401,"45.687015327701744, -0.30961254566784263",https://maps.app.goo.gl/3rFZozDqhQeAngfP9,feed,,,"2026/09 Lasenor
+644,LSN,Vétalis Châteaubernard - Cognac (fr),,https://www.vetalis.fr/,,10 Avenue d'Angoulême; 16100; Châteaubernard; FRANCE,,Vetalis (fr),France,FR-0401,"45.687015327701744, -0.30961254566784263",https://maps.app.goo.gl/3rFZozDqhQeAngfP9,feed,,,"2026/09 Lasenor
 lead SPACE 2026 (fr)
 Vetalis (fr) / Vétalis (fr)"
-646,LSN,Vitalac (fr),,,,48 Rue Principale; 22160; Carnoët; FRANCE,,,France,FR-0702,"48.36972313707312, -3.5237307883351874",https://maps.app.goo.gl/eaSbzaWktv6giZkS8,feed,,,"2026/09 Lasenor
+645,LSN,Vitalac (fr),,https://www.vitalac.eu/,,48 Rue Principale; 22160; Carnoët; FRANCE,,,France,FR-0702,"48.36972313707312, -3.5237307883351874",https://maps.app.goo.gl/eaSbzaWktv6giZkS8,feed,,,"2026/09 Lasenor
 lead SPACE 2026 (fr)
 Vitalac (fr)
 Vitalac es un grupo francés independiente (fundado en 1989, ~120 empleados), fabricante de leches maternizadas para terneros/lechones, minerales, premezclas, secuestrantes de micotoxinas y acidificantes, no perteneciente a ningún grupo mayor."
-,,,,,,,,,,,,,,,,
+646,LSN,Adisseo (es),,http://www.adisseo.com,,"Calle Merindad de Castilla la Vieja, 2A; 09001; Burgos; SPAIN",,,Spain,,"42.3735889825188, -3.737988374560141",https://maps.app.goo.gl/JM6aZKqtQFpfjkCR8,feed,,,2026/04 Lasenor
+647,LSN,Confiserie Triki Le Moulin (tn),,https://www.confiserietriki.com/,,Route de Gabès km3; 3052; Sfax; TUNISIE,,,Tunisia,,"34.71832184356315, 10.731359685276253","https://www.google.com/maps/search/?api=1&query=43.54528910681921,5.3677122703407925",confectionary,,,2026/04 Lasenor
 ,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,
